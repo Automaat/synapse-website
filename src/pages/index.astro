@@ -316,10 +316,17 @@ const docsUrl = '/getting-started/';
       });
 
       // ── Scroll reveal ────────────────────────────────────────
+      // Transition is applied via JS (not CSS) so the initial opacity:0
+      // state carries no transition property — prevents Blink from
+      // eagerly promoting elements to GPU compositing layers before
+      // any animation runs, which caused a visible color seam in dark mode.
       const observer = new IntersectionObserver(
         (entries) => entries.forEach((e, i) => {
           if (e.isIntersecting) {
-            setTimeout(() => e.target.classList.add('visible'), i * 60);
+            setTimeout(() => {
+              (e.target as HTMLElement).style.transition = 'opacity 0.6s ease';
+              e.target.classList.add('visible');
+            }, i * 60);
             observer.unobserve(e.target);
           }
         }),

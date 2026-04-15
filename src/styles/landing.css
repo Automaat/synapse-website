@@ -176,10 +176,9 @@ html[data-theme="light"] .terminal-header { background: #2a1e18; }
 html[data-theme="light"] .terminal-prompt { color: #6b5a54; }
 html[data-theme="light"] .terminal-comment { color: #4a3830; }
 
-/* Reveal animation */
+/* Reveal animation — no transition here; applied via JS at animation time */
 .reveal {
   opacity: 0;
-  transition: opacity 0.6s ease;
 }
 .reveal.visible {
   opacity: 1;
