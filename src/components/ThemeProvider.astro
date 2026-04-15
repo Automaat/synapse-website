@@ -8,7 +8,8 @@
       (typeof localStorage !== 'undefined' &&
         (localStorage.getItem('theme') || localStorage.getItem('starlight-theme'))) ||
       null;
-    const theme = storedTheme || 'light';
+    const theme = storedTheme ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const resolved = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = resolved;
     // Keep both keys in sync.

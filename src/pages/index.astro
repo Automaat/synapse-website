@@ -14,7 +14,8 @@ const docsUrl = '/getting-started/';
     <title>Sybra — Multi-agent orchestration</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline>
-      const t = localStorage.getItem('theme') || localStorage.getItem('starlight-theme') || 'light';
+      const t = localStorage.getItem('theme') || localStorage.getItem('starlight-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', t);
       localStorage.setItem('starlight-theme', t);
     </script>
@@ -308,8 +309,9 @@ const docsUrl = '/getting-started/';
         updateNav();
       };
 
-      // Init — prefer landing page key, fall back to starlight key, then light default
-      applyTheme(localStorage.getItem('theme') ?? localStorage.getItem('starlight-theme') ?? 'light');
+      // Init — prefer stored key, fall back to OS preference
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      applyTheme(localStorage.getItem('theme') ?? localStorage.getItem('starlight-theme') ?? systemTheme);
 
       document.getElementById('theme-toggle')?.addEventListener('click', () => {
         applyTheme(html.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
