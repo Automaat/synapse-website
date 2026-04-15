@@ -78,8 +78,6 @@ body {
 .site-nav {
   background: var(--color-nav-bg);
   border-bottom: 1px solid var(--color-nav-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   height: 56px;
   transition: none;
 }
@@ -87,8 +85,6 @@ body {
 .site-nav.is-scrolled {
   background: var(--color-nav-bg);
   border-bottom-color: var(--color-nav-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Display headings use Space Grotesk */
@@ -106,27 +102,6 @@ h1, h2, h3, .display {
 /* Gradient text */
 .accent-text {
   color: var(--color-accent);
-}
-
-/* Hero glow */
-.hero-glow {
-  position: fixed;
-  width: 800px;
-  height: 600px;
-  background: radial-gradient(ellipse, rgba(254,134,15,0.05) 0%, transparent 70%);
-  pointer-events: none;
-  top: -200px;
-  left: -200px;
-  filter: blur(60px);
-}
-
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) .hero-glow {
-    background: radial-gradient(ellipse, rgba(195,86,0,0.04) 0%, transparent 70%);
-  }
-}
-html[data-theme="light"] .hero-glow {
-  background: radial-gradient(ellipse, rgba(195,86,0,0.04) 0%, transparent 70%);
 }
 
 /* Feature number */
