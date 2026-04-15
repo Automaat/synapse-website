@@ -65,6 +65,17 @@ html[data-theme="light"] {
 html {
   scroll-behavior: smooth;
   background-color: var(--color-bg);
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-theme]) {
+    color-scheme: light;
+  }
 }
 
 body {
@@ -78,8 +89,6 @@ body {
 .site-nav {
   background: var(--color-nav-bg);
   border-bottom: 1px solid var(--color-nav-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   height: 56px;
   transition: none;
 }
@@ -87,8 +96,6 @@ body {
 .site-nav.is-scrolled {
   background: var(--color-nav-bg);
   border-bottom-color: var(--color-nav-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Display headings use Space Grotesk */
@@ -106,27 +113,6 @@ h1, h2, h3, .display {
 /* Gradient text */
 .accent-text {
   color: var(--color-accent);
-}
-
-/* Hero glow */
-.hero-glow {
-  position: fixed;
-  width: 800px;
-  height: 600px;
-  background: radial-gradient(ellipse, rgba(254,134,15,0.05) 0%, transparent 70%);
-  pointer-events: none;
-  top: -200px;
-  left: -200px;
-  filter: blur(60px);
-}
-
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) .hero-glow {
-    background: radial-gradient(ellipse, rgba(195,86,0,0.04) 0%, transparent 70%);
-  }
-}
-html[data-theme="light"] .hero-glow {
-  background: radial-gradient(ellipse, rgba(195,86,0,0.04) 0%, transparent 70%);
 }
 
 /* Feature number */
@@ -190,13 +176,10 @@ html[data-theme="light"] .terminal-header { background: #2a1e18; }
 html[data-theme="light"] .terminal-prompt { color: #6b5a54; }
 html[data-theme="light"] .terminal-comment { color: #4a3830; }
 
-/* Reveal animation */
+/* Reveal animation — no transition here; applied via JS at animation time */
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 .reveal.visible {
   opacity: 1;
-  transform: translateY(0);
 }
