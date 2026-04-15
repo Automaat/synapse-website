@@ -1,0 +1,130 @@
+@import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-bg: #0a0a0a;
+  --color-surface: #111111;
+  --color-surface-high: #1a1a1a;
+  --color-border: #222222;
+  --color-border-subtle: #1a1a1a;
+  --color-text: #f0f0f0;
+  --color-muted: #666666;
+  --color-accent: #8b5cf6;
+  --color-accent-light: #a78bfa;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero glow */
+.hero-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: blur(40px);
+}
+
+/* Bento card */
+.bento-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 28px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.bento-card:hover {
+  border-color: #333;
+  transform: translateY(-2px);
+}
+
+/* Code block */
+.terminal {
+  background: #0d0d0d;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.terminal-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-body {
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #d4d4d4;
+}
+
+.terminal-prompt { color: #666; }
+.terminal-cmd { color: #a78bfa; }
+.terminal-arg { color: #60a5fa; }
+.terminal-output { color: #4ade80; }
+.terminal-comment { color: #555; }
+
+/* Step number */
+.step-number {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(96,165,250,0.2));
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent-light);
+  flex-shrink: 0;
+}
+
+/* Animate on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

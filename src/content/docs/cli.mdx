@@ -1,0 +1,113 @@
+---
+title: CLI Reference
+description: Complete reference for the synapse-cli command-line tool.
+---
+
+`synapse-cli` is a standalone binary for task and project CRUD. It reuses the same store and config as the GUI, making it safe to use alongside the running app.
+
+## Global flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output machine-readable JSON (for scripting) |
+
+## Tasks
+
+### `synapse-cli list`
+
+```sh
+synapse-cli list [--status STATUS] [--tag TAG]
+```
+
+List tasks. Filters are optional and combinable.
+
+```sh
+synapse-cli list --status todo
+synapse-cli list --tag backend --json
+```
+
+### `synapse-cli get`
+
+```sh
+synapse-cli get <id>
+```
+
+Print a single task (frontmatter + body).
+
+### `synapse-cli create`
+
+```sh
+synapse-cli create --title TITLE [options]
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--title` | required | Task title |
+| `--body` | `""` | Markdown body |
+| `--mode` | `headless` | `headless` or `interactive` |
+| `--tags` | `[]` | Comma-separated tags |
+| `--project` | `""` | `owner/repo` project ID |
+
+```sh
+synapse-cli create \
+  --title "Add rate limiting middleware" \
+  --mode headless \
+  --tags backend,infra \
+  --project myorg/api
+```
+
+### `synapse-cli update`
+
+```sh
+synapse-cli update <id> [options]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--title` | New title |
+| `--status` | New status |
+| `--body` | New markdown body |
+| `--mode` | New agent mode |
+| `--tags` | New tags (replaces existing) |
+
+```sh
+synapse-cli update task-abc123 --status in-review
+```
+
+### `synapse-cli delete`
+
+```sh
+synapse-cli delete <id>
+```
+
+Permanently deletes the task file. Running agents are not stopped automatically.
+
+## Projects
+
+### `synapse-cli project list`
+
+List all registered projects.
+
+### `synapse-cli project get <id>`
+
+Print project metadata.
+
+### `synapse-cli project create`
+
+```sh
+synapse-cli project create --url https://github.com/owner/repo [--type TYPE]
+```
+
+Clones the repo as a bare repository and registers it.
+
+### `synapse-cli project delete <id>`
+
+Remove a project registration and its bare clone.
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | General error |
+| `2` | Not found |

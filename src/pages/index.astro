@@ -1,0 +1,389 @@
+---
+import '../styles/landing.css';
+
+const ghUrl = 'https://github.com/automaat/synapse';
+const docsUrl = '/getting-started/';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Local-first Claude Code agent orchestration for your desktop. Headless and interactive modes, git worktree isolation, zero cloud required." />
+    <title>Synapse — Orchestrate Claude Code Agents</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+
+    <!-- NAV -->
+    <nav id="nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+      <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5 font-semibold text-[var(--color-text)]">
+          <img src="/favicon.svg" alt="Synapse" class="w-6 h-6" />
+          Synapse
+        </a>
+        <div class="flex items-center gap-6">
+          <a href={docsUrl} class="text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors text-sm">Docs</a>
+          <a href={ghUrl} class="text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors text-sm" target="_blank" rel="noopener">GitHub</a>
+          <a href={`${ghUrl}/releases`} target="_blank" rel="noopener" class="bg-[var(--color-accent)] hover:opacity-90 text-white text-sm px-4 py-1.5 rounded-lg transition-opacity font-medium">
+            Download
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+
+      <!-- HERO -->
+      <section class="relative pt-36 pb-28 px-6 overflow-hidden">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="max-w-4xl mx-auto text-center relative">
+
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 bg-[rgba(139,92,246,0.1)] border border-[rgba(139,92,246,0.25)] rounded-full px-4 py-1.5 text-sm text-[var(--color-accent-light)] mb-8">
+            <span class="w-1.5 h-1.5 bg-[var(--color-accent)] rounded-full animate-pulse"></span>
+            Open Source · macOS · Local-first
+          </div>
+
+          <!-- Headline -->
+          <h1 class="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+            Orchestrate Claude Code<br />
+            <span class="gradient-text">agents from your desktop</span>
+          </h1>
+
+          <!-- Sub -->
+          <p class="text-lg md:text-xl text-[var(--color-muted)] max-w-2xl mx-auto leading-relaxed mb-10">
+            Local-first task management and agent swarm for Claude Code.
+            Headless and interactive modes, git worktree isolation, zero cloud required.
+          </p>
+
+          <!-- CTAs -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href={`${ghUrl}/releases`} target="_blank" rel="noopener"
+               class="group flex items-center gap-2 bg-[var(--color-accent)] hover:opacity-90 text-white px-6 py-3 rounded-xl font-medium transition-opacity text-base w-full sm:w-auto justify-center">
+              Download for macOS
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="transition-transform group-hover:translate-y-0.5">
+                <path d="M8 2v8M4 7l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a href={docsUrl}
+               class="flex items-center gap-2 border border-[var(--color-border)] hover:border-[#333] text-[var(--color-text)] px-6 py-3 rounded-xl font-medium transition-colors text-base w-full sm:w-auto justify-center hover:bg-[var(--color-surface)]">
+              Read the Docs
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- Screenshot placeholder -->
+          <div class="mt-16 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--color-bg)] z-10 pointer-events-none rounded-2xl"></div>
+            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+              <!-- Fake window chrome -->
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface-high)]">
+                <span class="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
+                <span class="w-3 h-3 rounded-full bg-[#febc2e]"></span>
+                <span class="w-3 h-3 rounded-full bg-[#28c840]"></span>
+                <span class="ml-4 text-xs text-[var(--color-muted)]">Synapse</span>
+              </div>
+              <!-- App mockup -->
+              <div class="flex h-[380px]">
+                <!-- Sidebar -->
+                <div class="w-56 border-r border-[var(--color-border)] p-3 flex flex-col gap-1">
+                  <div class="text-xs text-[var(--color-muted)] px-2 py-1 uppercase tracking-wider mb-1">Tasks</div>
+                  {[
+                    { title: 'Add auth middleware', status: 'in-progress', color: '#f59e0b' },
+                    { title: 'Fix rate limiting', status: 'todo', color: '#6b7280' },
+                    { title: 'Refactor DB layer', status: 'in-progress', color: '#f59e0b' },
+                    { title: 'Update API docs', status: 'done', color: '#4ade80' },
+                    { title: 'Write e2e tests', status: 'todo', color: '#6b7280' },
+                    { title: 'Deploy to staging', status: 'human-required', color: '#f97316' },
+                  ].map(task => (
+                    <div class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-[var(--color-surface-high)] cursor-pointer">
+                      <span class="w-2 h-2 rounded-full flex-shrink-0" style={`background: ${task.color}`}></span>
+                      <span class="text-xs text-[var(--color-text)] truncate">{task.title}</span>
+                    </div>
+                  ))}
+                </div>
+                <!-- Main panel -->
+                <div class="flex-1 p-5 flex flex-col gap-4">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+                        <span class="text-xs text-[var(--color-muted)]">in-progress · headless</span>
+                      </div>
+                      <h3 class="text-sm font-semibold text-[var(--color-text)]">Add auth middleware</h3>
+                    </div>
+                    <span class="text-xs bg-[var(--color-surface-high)] border border-[var(--color-border)] px-2 py-1 rounded text-[var(--color-muted)]">task-a8f23c</span>
+                  </div>
+                  <!-- Agent output -->
+                  <div class="flex-1 bg-[#0d0d0d] rounded-lg p-4 font-mono text-xs text-[#888] leading-relaxed overflow-hidden">
+                    <div class="text-[#4ade80]">✓ Created worktree at ~/synapse/worktrees/task-a8f23c</div>
+                    <div class="mt-1 text-[#888]">Starting claude -p with stream-json...</div>
+                    <div class="mt-2 text-[#a78bfa]">▶ Reading existing middleware patterns</div>
+                    <div class="text-[#888] mt-1">  Found 3 middleware files in internal/http/</div>
+                    <div class="mt-2 text-[#a78bfa]">▶ Writing internal/http/auth.go</div>
+                    <div class="text-[#888] mt-1">  Implementing JWT validation with refresh token support</div>
+                    <div class="mt-2 text-[#a78bfa]">▶ Writing internal/http/auth_test.go</div>
+                    <div class="text-[#888] mt-1">  Adding table-driven tests...</div>
+                    <div class="mt-2 text-[#60a5fa] animate-pulse">● Processing...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES BENTO GRID -->
+      <section id="features" class="py-24 px-6">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-14 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-3">Everything you need to ship with agents</h2>
+            <p class="text-[var(--color-muted)] text-lg">Built for the way Claude Code actually works.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Task Management — large -->
+            <div class="bento-card md:col-span-2 reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(139,92,246,0.15)] border border-[rgba(139,92,246,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M4 6h12M4 10h8M4 14h6" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Task Management</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-4">YAML frontmatter + GFM markdown. Every task is a plain file — version-controlled, diffable, and editable in any text editor.</p>
+              <div class="bg-[#0d0d0d] rounded-lg p-3 font-mono text-xs leading-relaxed text-[#888] border border-[var(--color-border-subtle)]">
+                <div class="text-[#555]">---</div>
+                <div><span class="text-[#60a5fa]">id</span><span class="text-[#888]">: task-a8f23c</span></div>
+                <div><span class="text-[#60a5fa]">title</span><span class="text-[#888]">: Add auth middleware</span></div>
+                <div><span class="text-[#60a5fa]">status</span><span class="text-[#888]">: in-progress</span></div>
+                <div><span class="text-[#60a5fa]">agent_mode</span><span class="text-[#888]">: headless</span></div>
+                <div class="text-[#555]">---</div>
+              </div>
+            </div>
+
+            <!-- Headless Agents -->
+            <div class="bento-card reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(96,165,250,0.15)] border border-[rgba(96,165,250,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 3v14M3 10l7 7 7-7" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Headless Agents</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed">Run <code class="text-[#a78bfa] bg-[rgba(139,92,246,0.1)] px-1 rounded">claude -p</code> with stream-JSON. Parallel execution, live output streaming, full tool access.</p>
+            </div>
+
+            <!-- Interactive Mode -->
+            <div class="bento-card reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(74,222,128,0.15)] border border-[rgba(74,222,128,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="4" width="16" height="12" rx="2" stroke="#4ade80" stroke-width="1.5"/>
+                  <path d="M6 10l3 3 5-5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Interactive Mode</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed">tmux sessions for hands-on work. Attach any terminal and collaborate with the agent in real time.</p>
+            </div>
+
+            <!-- Git Isolation — large -->
+            <div class="bento-card md:col-span-2 reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(249,115,22,0.15)] border border-[rgba(249,115,22,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="5" cy="5" r="2" stroke="#fb923c" stroke-width="1.5"/>
+                  <circle cx="15" cy="5" r="2" stroke="#fb923c" stroke-width="1.5"/>
+                  <circle cx="5" cy="15" r="2" stroke="#fb923c" stroke-width="1.5"/>
+                  <path d="M5 7v6M7 5h6" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Git Worktree Isolation</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed mb-4">Each task gets its own git worktree. Agents work in complete isolation — no branch conflicts, no stepping on each other's changes. Worktrees are created on agent start and cleaned up on completion.</p>
+              <div class="flex gap-2 flex-wrap">
+                {['Isolated branches', 'Auto cleanup', 'Parallel safe', 'Full git history'].map(tag => (
+                  <span class="text-xs bg-[var(--color-surface-high)] border border-[var(--color-border)] px-2.5 py-1 rounded-full text-[var(--color-muted)]">{tag}</span>
+                ))}
+              </div>
+            </div>
+
+            <!-- GitHub & Todoist -->
+            <div class="bento-card reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(244,114,182,0.15)] border border-[rgba(244,114,182,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.34c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.21 1.86.86 2.31.66.07-.51.28-.86.5-1.06-1.77-.2-3.63-.89-3.63-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.65 7.65 0 0110 7.8c.68 0 1.36.09 2 .26 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8.013 8.013 0 0018 10c0-4.42-3.58-8-8-8z" fill="#f472b6"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">GitHub & Todoist Sync</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed">Auto-create tasks from GitHub Issues and Todoist projects. Route by label, project type, or machine.</p>
+            </div>
+
+            <!-- Multi-machine -->
+            <div class="bento-card reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(251,191,36,0.15)] border border-[rgba(251,191,36,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="3" width="7" height="7" rx="1.5" stroke="#fbbf24" stroke-width="1.5"/>
+                  <rect x="11" y="3" width="7" height="7" rx="1.5" stroke="#fbbf24" stroke-width="1.5"/>
+                  <rect x="2" y="12" width="7" height="7" rx="1.5" stroke="#fbbf24" stroke-width="1.5"/>
+                  <rect x="11" y="12" width="7" height="7" rx="1.5" stroke="#fbbf24" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Multi-machine</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed">Laptop + server, no overlap. Route work by project type — each machine handles its own queue.</p>
+            </div>
+
+            <!-- Server Deployment -->
+            <div class="bento-card reveal">
+              <div class="mb-4 w-10 h-10 rounded-lg bg-[rgba(52,211,153,0.15)] border border-[rgba(52,211,153,0.2)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="5" width="16" height="10" rx="2" stroke="#34d399" stroke-width="1.5"/>
+                  <circle cx="6" cy="10" r="1" fill="#34d399"/>
+                  <path d="M9 10h7" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold mb-2">Server Deployment</h3>
+              <p class="text-sm text-[var(--color-muted)] leading-relaxed">Run headless on a home server via Docker. Traefik + Cloudflare TLS, same binary, no GUI needed.</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how-it-works" class="py-24 px-6 border-t border-[var(--color-border)]">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-14 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-3">How it works</h2>
+            <p class="text-[var(--color-muted)] text-lg">From idea to shipped in three steps.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                n: '1',
+                title: 'Create a task',
+                desc: 'Write a markdown file with a YAML frontmatter header. Describe what you want built — Synapse handles the rest.',
+              },
+              {
+                n: '2',
+                title: 'Assign an agent',
+                desc: 'Pick headless for fully autonomous execution, or interactive for a tmux session you can jump into at any point.',
+              },
+              {
+                n: '3',
+                title: 'Review and merge',
+                desc: "The agent works in an isolated git worktree. When it's done, review the diff and merge like any other PR.",
+              },
+            ].map(step => (
+              <div class="flex flex-col gap-4 reveal">
+                <div class="step-number">{step.n}</div>
+                <h3 class="text-base font-semibold">{step.title}</h3>
+                <p class="text-sm text-[var(--color-muted)] leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- CLI DEMO -->
+      <section id="demo" class="py-24 px-6">
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-10 reveal">
+            <h2 class="text-3xl font-bold tracking-tight mb-3">Scriptable from the CLI</h2>
+            <p class="text-[var(--color-muted)]">All task operations available via <code class="text-[#a78bfa] bg-[rgba(139,92,246,0.1)] px-1.5 py-0.5 rounded">synapse-cli</code> for use in your own automations.</p>
+          </div>
+
+          <div class="terminal reveal">
+            <div class="terminal-header">
+              <span class="terminal-dot bg-[#ff5f57]"></span>
+              <span class="terminal-dot bg-[#febc2e]"></span>
+              <span class="terminal-dot bg-[#28c840]"></span>
+              <span class="ml-3 text-xs text-[var(--color-muted)]">zsh</span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-comment"># Create a task and kick off a headless agent</div>
+              <div class="mt-2">
+                <span class="terminal-prompt">$ </span>
+                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-arg"> create --title "Refactor auth layer" --mode headless --tags backend,auth</span>
+              </div>
+              <div class="terminal-output">✓ Created task-f7d12a</div>
+
+              <div class="mt-4 terminal-comment"># List in-progress tasks</div>
+              <div class="mt-2">
+                <span class="terminal-prompt">$ </span>
+                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-arg"> list --status in-progress</span>
+              </div>
+              <div class="text-[#d4d4d4] mt-1">task-f7d12a  Refactor auth layer     in-progress  headless</div>
+              <div class="text-[#d4d4d4]">task-a8f23c  Add auth middleware     in-progress  headless</div>
+
+              <div class="mt-4 terminal-comment"># Update status when review is ready</div>
+              <div class="mt-2">
+                <span class="terminal-prompt">$ </span>
+                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-arg"> update task-a8f23c --status in-review</span>
+              </div>
+              <div class="terminal-output">✓ Updated task-a8f23c</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-[var(--color-border)] py-10 px-6">
+      <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+          <img src="/favicon.svg" alt="" class="w-5 h-5 opacity-60" />
+          <span>Synapse</span>
+          <span class="mx-2">·</span>
+          <span>MIT License</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm">
+          <a href={docsUrl} class="text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors">Docs</a>
+          <a href={`${ghUrl}`} target="_blank" rel="noopener" class="text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors">GitHub</a>
+          <a href={`${ghUrl}/releases`} target="_blank" rel="noopener" class="text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors">Releases</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Sticky nav background on scroll
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        if (nav) {
+          if (window.scrollY > 20) {
+            nav.style.background = 'rgba(10,10,10,0.9)';
+            nav.style.backdropFilter = 'blur(12px)';
+            nav.style.borderBottom = '1px solid #222';
+          } else {
+            nav.style.background = 'transparent';
+            nav.style.backdropFilter = 'none';
+            nav.style.borderBottom = '1px solid transparent';
+          }
+        }
+      });
+
+      // Scroll-triggered reveal
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('visible');
+              }, i * 80);
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    </script>
+
+  </body>
+</html>

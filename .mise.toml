@@ -1,0 +1,22 @@
+[tools]
+node = "24"
+
+[tasks.dev]
+run = "npm run dev"
+description = "Start dev server with hot reload"
+
+[tasks.build]
+run = "npm run build"
+description = "Build production site"
+
+[tasks.preview]
+run = "npm run preview"
+description = "Preview production build locally"
+
+[tasks.check]
+run = "npm run check"
+description = "TypeScript + Astro type check"
+
+[tasks.lint]
+run = "npm run lint"
+description = "Lint source files"

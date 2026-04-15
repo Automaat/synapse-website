@@ -1,0 +1,27 @@
+{
+  "name": "synapse-website",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "oxlint src"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.1.0",
+    "gsap": "^3.12.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/starlight": "^0.38.3",
+    "@astrojs/svelte": "^7.0.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "astro": "^6.1.6",
+    "oxlint": "^0.16.0",
+    "svelte": "^5.0.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.8.0",
+    "wrangler": "^3.0.0"
+  }
+}
