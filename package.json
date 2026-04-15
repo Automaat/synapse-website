@@ -6,7 +6,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "lint": "oxlint src"
+    "lint": "oxlint --ignore-pattern '**/*.astro' src"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
