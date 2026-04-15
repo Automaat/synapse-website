@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://synapse.mskalski.dev',
   integrations: [
     starlight({
-      title: 'Synapse',
+      title: 'Sybra',
       description: 'Local-first Claude Code agent orchestration for your desktop.',
       logo: {
         src: './public/favicon.svg',
@@ -16,6 +16,9 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/automaat/synapse' },
       ],
       customCss: ['./src/styles/starlight.css'],
+      components: {
+        ThemeProvider: './src/components/ThemeProvider.astro',
+      },
       sidebar: [
         {
           label: 'Getting Started',

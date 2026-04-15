@@ -1,9 +1,9 @@
 ---
 title: Projects & Git
-description: How Synapse mirrors GitHub repos and manages per-task git worktrees.
+description: How Sybra mirrors GitHub repos and manages per-task git worktrees.
 ---
 
-Projects connect tasks to real codebases. Synapse clones repos as bare repositories and creates isolated worktrees for each agent.
+Projects connect tasks to real codebases. Sybra clones repos as bare repositories and creates isolated worktrees for each agent.
 
 ## Storage layout
 
@@ -25,7 +25,7 @@ synapse-cli project create --url https://github.com/owner/repo
 
 Or via the GUI: **Projects → Add Project → paste GitHub URL**.
 
-Synapse clones the repo as a bare repository into `~/.synapse/clones/`. The bare clone is the source of truth; worktrees branch off it.
+Sybra clones the repo as a bare repository into `~/.synapse/clones/`. The bare clone is the source of truth; worktrees branch off it.
 
 ## project_id on tasks
 
@@ -35,7 +35,7 @@ Link a task to a project:
 project_id: owner/repo
 ```
 
-When the agent starts, Synapse automatically:
+When the agent starts, Sybra automatically:
 
 1. Creates a new branch `synapse/<task-id>` off the default branch
 2. Checks it out as a worktree at `~/.synapse/worktrees/<task-id>/`
@@ -45,7 +45,7 @@ On agent completion (or manual cleanup), the worktree is removed. The branch rem
 
 ## Keeping clones fresh
 
-Synapse runs a background fetch on registered projects. You can also trigger manually:
+Sybra runs a background fetch on registered projects. You can also trigger manually:
 
 ```sh
 synapse-cli project fetch owner/repo

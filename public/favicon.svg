@@ -1,5 +1,18 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="8" fill="#8b5cf6"/>
-  <path d="M8 16L13 11L18 16L13 21L8 16Z" fill="white" opacity="0.9"/>
-  <path d="M14 16L19 11L24 16L19 21L14 16Z" fill="white" opacity="0.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#0a0605"/>
+  <!-- S lettermark — monoline, rounded, geometric -->
+  <path
+    d="M 44,21
+       C 44,12 39,8 32,8
+       C 25,8 18,13 18,21
+       C 18,29 25,32 32,32
+       C 39,32 46,35 46,43
+       C 46,51 40,56 32,56
+       C 24,56 18,52 18,43"
+    stroke="#FE860F"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 </svg>

@@ -3,7 +3,7 @@ title: Agent Modes
 description: Headless vs. interactive agents — when to use each and how they work.
 ---
 
-Synapse supports two execution modes, selectable per-task via `agent_mode`.
+Sybra supports two execution modes, selectable per-task via `agent_mode`.
 
 ## Headless
 
@@ -11,7 +11,7 @@ Synapse supports two execution modes, selectable per-task via `agent_mode`.
 agent_mode: headless
 ```
 
-Spawns `claude -p "<task body>" --output-format stream-json` as a subprocess. Synapse reads stdout line-by-line and streams `StreamEvent` objects to the GUI.
+Spawns `claude -p "<task body>" --output-format stream-json` as a subprocess. Sybra reads stdout line-by-line and streams `StreamEvent` objects to the GUI.
 
 **Use when:**
 - The task is well-defined and self-contained
@@ -31,7 +31,7 @@ Spawns `claude -p "<task body>" --output-format stream-json` as a subprocess. Sy
 
 **Resuming sessions:**
 
-Synapse stores the session ID from the `init` event. If you restart a headless agent on the same task, it resumes the conversation:
+Sybra stores the session ID from the `init` event. If you restart a headless agent on the same task, it resumes the conversation:
 
 ```sh
 claude -p "continue" --resume <session-id> --output-format stream-json
@@ -43,24 +43,18 @@ claude -p "continue" --resume <session-id> --output-format stream-json
 agent_mode: interactive
 ```
 
-Opens a tmux session (`synapse-<task-id>`) and launches `claude` inside it. The GUI polls `tmux capture-pane` for a live preview.
+Opens an interactive Claude Code session you can watch and steer in real time.
 
 **Use when:**
 - You want to watch the agent work and intervene
 - The task requires tool approvals you want to handle manually
 - You're debugging or exploring the codebase alongside the agent
 
-**Attaching:**
-
-```sh
-tmux attach -t synapse-<task-id>
-```
-
-Or click **Attach** in the GUI to open your default terminal.
+Click **Attach** in the GUI to open the interactive session in your terminal.
 
 ## Parallel execution
 
-Multiple headless agents run concurrently — Synapse doesn't impose a limit. Each gets its own process, worktree, and event stream. The GUI shows all active agents in the sidebar.
+Multiple headless agents run concurrently — Sybra doesn't impose a limit. Each gets its own process, worktree, and event stream. The GUI shows all active agents in the sidebar.
 
 :::tip
 For large batches, consider the memory footprint: each headless agent uses a full `claude` process plus its worktree checkout.

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
+    "@fontsource/space-grotesk": "^5.2.10",
     "gsap": "^3.12.7"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "@tailwindcss/vite": "^4.1.0",
     "astro": "^6.1.6",
     "oxlint": "^0.16.0",
+    "playwright": "^1.59.1",
     "svelte": "^5.0.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.0",

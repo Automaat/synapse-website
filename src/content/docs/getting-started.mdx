@@ -1,15 +1,15 @@
 ---
 title: Introduction
-description: What Synapse is and how it orchestrates Claude Code agents.
+description: What Sybra is and how it orchestrates Claude Code agents.
 ---
 
-Synapse is a local desktop app (and headless server) for orchestrating a swarm of [Claude Code](https://github.com/anthropics/claude-code) agents. It combines markdown-based task management with two execution modes — headless `claude -p` and interactive tmux — all wrapped in a Wails v2 GUI.
+Sybra is a local desktop app (and headless server) for orchestrating a swarm of [Claude Code](https://github.com/anthropics/claude-code) agents. It combines markdown-based task management with two execution modes — headless `claude -p` and interactive — all wrapped in a Wails v2 GUI.
 
 ## What it does
 
 - **Task queue** — YAML frontmatter + GFM markdown files. Every task is a plain file, version-controlled and editable in any editor.
 - **Headless agents** — spawn `claude -p` processes, stream NDJSON output in real time, run multiple agents in parallel.
-- **Interactive mode** — open a tmux session; attach your terminal and collaborate with the agent directly.
+- **Interactive mode** — open an interactive session and collaborate with the agent directly.
 - **Git worktree isolation** — each task gets its own worktree so agents never conflict with each other or your working tree.
 - **GitHub & Todoist sync** — auto-create tasks from GitHub Issues or Todoist projects, filtered by label or project type.
 - **Multi-machine routing** — declare which project types each machine handles so work never duplicates across laptop + server.
@@ -19,7 +19,7 @@ Synapse is a local desktop app (and headless server) for orchestrating a swarm o
 | Concept | What it is |
 |---------|-----------|
 | **Task** | A `.md` file with YAML frontmatter (`id`, `title`, `status`, `agent_mode`, …) |
-| **Agent** | A running `claude -p` process or tmux session tied to a task |
+| **Agent** | A running `claude -p` process tied to a task |
 | **Project** | A mirrored GitHub repo with a bare clone and per-task worktrees |
 | **Store** | `~/.synapse/` — all tasks, projects, and config live here |
 

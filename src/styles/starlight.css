@@ -1,15 +1,20 @@
-/* Override Starlight accent color to match Synapse brand */
+/* Override only accent colour and font — let Starlight handle dark/light bg/text */
 :root {
-  --sl-color-accent-low: #3b2b6e;
-  --sl-color-accent: #8b5cf6;
-  --sl-color-accent-high: #c4b5fd;
-  --sl-color-white: #f0f0f0;
-  --sl-color-gray-1: #e5e5e5;
-  --sl-color-gray-2: #aaaaaa;
-  --sl-color-gray-3: #666666;
-  --sl-color-gray-4: #333333;
-  --sl-color-gray-5: #1a1a1a;
-  --sl-color-gray-6: #111111;
-  --sl-color-black: #0a0a0a;
   --sl-font: 'Inter', system-ui, sans-serif;
+}
+
+/* Dark mode accent */
+:root,
+[data-theme='dark'] {
+  --sl-color-accent-low: #3d1e00;
+  --sl-color-accent: #fe860f;
+  --sl-color-accent-high: #ffc07a;
+}
+
+/* Light mode accent */
+:root[data-theme='light'],
+[data-theme='light'] {
+  --sl-color-accent-low: #ffe4cc;
+  --sl-color-accent: #c35600;
+  --sl-color-accent-high: #7a2e00;
 }
