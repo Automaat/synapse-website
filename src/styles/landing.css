@@ -66,6 +66,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--color-bg);
   color-scheme: dark;
+  overflow-x: hidden;
 }
 
 html[data-theme="light"] {
@@ -84,6 +85,7 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 .site-nav {
@@ -175,6 +177,58 @@ html[data-theme="light"] .terminal-header { background: #2a1e18; }
 }
 html[data-theme="light"] .terminal-prompt { color: #6b5a54; }
 html[data-theme="light"] .terminal-comment { color: #4a3830; }
+
+/* CLI section */
+@media (max-width: 640px) {
+  .cli-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+}
+
+/* Features row */
+.feature-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .feature-row {
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+  .feature-row .feature-body {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Hero responsive typography */
+.hero-h1 {
+  font-size: clamp(4.5rem, 14vw, 8rem);
+}
+
+.hero-desc {
+  font-size: 1.35rem;
+}
+
+@media (max-width: 640px) {
+  .hero-desc {
+    font-size: 0.85rem;
+  }
+  .hero-eyebrow {
+    gap: 2rem;
+  }
+  .hero-eyebrow .feature-num {
+    font-size: 9px;
+  }
+  .hero-eyebrow .hero-tagline {
+    font-size: 9px;
+  }
+}
 
 /* Reveal animation — no transition here; applied via JS at animation time */
 .reveal {
