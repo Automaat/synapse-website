@@ -1,30 +1,116 @@
 ---
-title: Introduction
-description: What Sybra is and how it orchestrates Claude Code agents.
+title: Getting started
+description: Install Sybra, register a project, run your first agent — in under 10 minutes.
 ---
 
-Sybra is a local desktop app (and headless server) for orchestrating a swarm of [Claude Code](https://github.com/anthropics/claude-code) agents. It combines markdown-based task management with two execution modes — headless `claude -p` and interactive — all wrapped in a Wails v2 GUI.
+> **Prerequisites**
+> - macOS (Darwin) or Linux
+> - [mise](https://mise.jdx.dev) for tool versions
+> - [Claude Code](https://docs.claude.com/claude-code) installed and logged in
+> - `tmux` ≥ 3.3 and `git` ≥ 2.40
+>
+> **Estimated time**: 10 minutes.
 
-## What it does
+This tutorial walks you end-to-end: install → first project → first agent → verify. No branching, no "or you can skip this". Follow every step.
 
-- **Task queue** — YAML frontmatter + GFM markdown files. Every task is a plain file, version-controlled and editable in any editor.
-- **Headless agents** — spawn `claude -p` processes, stream NDJSON output in real time, run multiple agents in parallel.
-- **Interactive mode** — open an interactive session and collaborate with the agent directly.
-- **Git worktree isolation** — each task gets its own worktree so agents never conflict with each other or your working tree.
-- **GitHub & Todoist sync** — auto-create tasks from GitHub Issues or Todoist projects, filtered by label or project type.
-- **Multi-machine routing** — declare which project types each machine handles so work never duplicates across laptop + server.
+## 1. Install
 
-## Core concepts
+Clone and build:
 
-| Concept | What it is |
-|---------|-----------|
-| **Task** | A `.md` file with YAML frontmatter (`id`, `title`, `status`, `agent_mode`, …) |
-| **Agent** | A running `claude -p` process tied to a task |
-| **Project** | A mirrored GitHub repo with a bare clone and per-task worktrees |
-| **Store** | `~/.sybra/` — all tasks, projects, and config live here |
+```bash
+git clone https://github.com/Automaat/sybra.git
+cd sybra
+mise install
+mise run build
+```
 
-## Next steps
+The build produces a Wails binary under `build/bin/`. Launch it:
 
-- [Installation](/docs/installation/) — install the binary or run from source
-- [Task Format](/docs/tasks/) — full YAML frontmatter reference
-- [Agent Modes](/docs/agents/) — headless vs. interactive, when to use each
+```bash
+mise run dev
+```
+
+A native window opens. You land on the Dashboard.
+
+![Dashboard](/screenshots/dark/dashboard.png)
+
+## 2. Register a project
+
+Sybra mirrors GitHub repositories as bare clones, then creates per-task git worktrees on demand. Open **Projects** in the sidebar.
+
+![Projects](/screenshots/dark/projects.png)
+
+Click **New project**. Enter a GitHub URL:
+
+```
+https://github.com/YOURUSER/YOURREPO
+```
+
+Pick a type — `pet` or `work`. (This controls per-machine routing. See [Per-machine routing](/concepts/orchestrator-and-automation/#per-machine-routing).)
+
+Sybra clones the repo as a bare mirror under `~/.sybra/clones/`. No worktrees yet — those appear when agents start.
+
+## 3. Create a task
+
+Press **⌘N** to open Quick Add.
+
+![Quick Add](/screenshots/dark/quick-add-task.png)
+
+Fill in:
+
+- **Title**: `Add hello-world endpoint`
+- **Project**: the project you just registered
+- **Mode**: `headless`
+- **Tags**: `backend`, `small`
+
+Press **⌘Enter** to create.
+
+The task appears on the board as `new`.
+
+![Task board](/screenshots/dark/task-board.png)
+
+## 4. Dispatch an agent
+
+Open the task (click it or press `Enter`). You see the task detail panel.
+
+![Task detail](/screenshots/dark/task-detail.png)
+
+Press **S** to move the status to `todo`. Then click **Start agent**.
+
+Sybra:
+
+1. Creates a git worktree under `~/.sybra/worktrees/<task-id>/`
+2. Spawns `claude -p "<task body>" --output-format stream-json` in that directory
+3. Streams NDJSON events back to the UI (init → assistant → tool_use → tool_result → result)
+
+Watch the Agents page:
+
+![Agent detail](/screenshots/dark/agent-detail.png)
+
+Every assistant turn, tool call, and error appears live. Cost updates in real time.
+
+## 5. Review and merge
+
+When the agent finishes, it pushes a branch and opens a PR (if your workflow includes the PR step). The task moves to `in-review`.
+
+![Reviews](/screenshots/dark/reviews.png)
+
+Open **Reviews** in the sidebar. Click the PR. You can read the diff, add inline comments, and dispatch a `pr-fix` agent to address them — all without leaving Sybra.
+
+![Review with comments](/screenshots/dark/reviews-plan-selected.png)
+
+Merge in GitHub, pull locally, done. Sybra removes the worktree automatically.
+
+## What just happened
+
+- A markdown file (`~/.sybra/tasks/<task-id>.md`) tracked the task's state.
+- A git worktree gave the agent an isolated checkout.
+- A Claude Code subprocess streamed NDJSON which Sybra parsed into events you saw in the UI.
+- Cost, tokens, and tool calls were persisted to `~/.sybra/stats.json` and the audit log.
+
+## Where to go next
+
+- [Tasks and agents](/concepts/tasks-and-agents/) — the mental model
+- [Execution modes](/concepts/execution-modes/) — when to pick headless vs interactive
+- [Projects and worktrees](/concepts/projects-and-worktrees/) — bare-repo mirroring explained
+- [Orchestrator and automation](/concepts/orchestrator-and-automation/) — let Sybra triage and dispatch on its own

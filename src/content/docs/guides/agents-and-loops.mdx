@@ -1,0 +1,173 @@
+---
+title: Run and monitor agents
+description: Start agents, inspect streams, approve tools, handle escalations, and schedule loop agents.
+---
+
+The Agents page is where live agents live. Orchestrator console, loop agents, and one-off runs all converge here.
+
+![Agents page](/screenshots/dark/agents.png)
+
+## Start an agent
+
+From a task:
+
+1. Open the task
+2. Ensure status is `todo`
+3. Click **Start agent**
+
+From a workflow:
+
+- Workflows dispatch agents automatically on their `run_agent` steps. You don't click anything.
+
+From the CLI:
+
+```bash
+sybra-cli update <task-id> --status in-progress
+# Workflow-less dispatch isn't a CLI command; use the GUI for one-offs.
+```
+
+## Inspect a running agent
+
+Click any card on the Agents page. The detail view shows the live event stream.
+
+![Agent detail](/screenshots/dark/agent-detail.png)
+
+Four panes:
+
+- **Stream** — init / assistant / tool_use / tool_result / result events
+- **Cost & tokens** — updates on every `result` event
+- **Session ID** — copy to resume via `claude -p --resume`
+- **Controls** — send message, approve tools, kill
+
+## Send a message
+
+Type into the message box at the bottom. Press **⌘Enter** to send. Sybra resumes the Claude Code session with your message as the next user turn.
+
+Works in both modes:
+
+- Headless — message becomes the next `claude -p --resume` turn
+- Interactive — message is typed into the tmux pane
+
+## Approve tools
+
+When `require_permissions: true`, the agent pauses on every `tool_use`. The event panel shows the pending tool and its arguments. Actions:
+
+- **Approve** — tool runs, agent resumes
+- **Reject** — tool is blocked, agent sees the denial and reasons around it
+- **Approve always for this run** — sticks for the rest of the session
+
+You can also pre-approve tools by setting `allowed_tools` on the task before dispatch.
+
+## Handle escalations
+
+When an agent hits a budget (`agent.max_cost_usd`), turn count (`agent.max_turns`), or repeated errors, it escalates instead of silently stopping. The UI shows:
+
+- **Continue** — raise the budget/turn cap by 50% and resume
+- **Kill** — stop the agent, mark the task `human-required`
+- **Increase limit** — set an explicit new cap
+
+Escalation reasons show in `agent.escalation_reason`. Common ones:
+
+| Reason | What happened |
+|---|---|
+| `budget_exhausted` | `cost_usd` exceeded `agent.max_cost_usd` |
+| `turns_exhausted` | `turn_count` exceeded `agent.max_turns` |
+| `repeated_failure` | Same error thrown N times in a row |
+| `tool_denied` | A required tool was denied |
+
+## Stop an agent
+
+Click **Stop**. Sybra sends SIGTERM, waits 10 seconds, then SIGKILL if the process refuses to exit. Worktree cleanup respects commits: worktrees with unpushed commits are kept; empty worktrees are removed.
+
+## The orchestrator
+
+![Orchestrator console](/screenshots/dark/agents-orchestrator.png)
+
+The orchestrator is a long-lived conversational agent. Start/stop it from the Orchestrator tab. When running:
+
+- It polls new tasks and triages them
+- It dispatches agents up to `agent.max_concurrent`
+- It comments on stalled work via the monitor
+- You can talk to it in the console
+
+Treat it as a teammate, not a service. Ask it questions. Tell it to ignore specific tasks. Ask it to explain a decision.
+
+## Loop agents
+
+Recurring headless jobs. Live under the **Loops** tab.
+
+![Loops](/screenshots/dark/agents-loops.png)
+
+### Create a loop
+
+Click **New loop**:
+
+![New loop dialog](/screenshots/dark/agents-loops-new-dialog.png)
+
+Fields:
+
+| Field | Purpose |
+|---|---|
+| Name | Display only |
+| Prompt | Full prompt sent to `claude -p` on every tick |
+| Interval | Seconds between runs (min 60) |
+| Allowed tools | Same semantics as tasks |
+| Provider | `claude` or `codex` |
+| Model | Override the default |
+| Enabled | Kill switch |
+
+Each loop is a YAML file under `~/.sybra/loop-agents/<id>.yaml`. Persisted per-machine, so a laptop and a server have different loops.
+
+### Run now
+
+Every loop has a **Run now** button. Forces a tick outside the normal schedule. Useful for testing.
+
+### Typical loops
+
+```yaml
+# babysit PRs every 30 min
+name: Babysit PRs
+prompt: |
+  Check open PRs. For Renovate PRs with green CI, approve and merge.
+  For others, summarize blockers.
+interval_sec: 1800
+
+# morning standup every day at 09:00
+name: Morning standup
+prompt: |
+  Summarize yesterday's work from the audit log. Post to #daily.
+interval_sec: 86400
+```
+
+The loop scheduler is a single ticker — loops don't run concurrently with each other, but they run alongside normal agents.
+
+## Common patterns
+
+### "Give the agent more budget"
+
+1. Open agent detail
+2. Click **Increase limit**
+3. Set new cap (e.g. `$2.00` for expensive refactors)
+4. Agent resumes
+
+### "Agent is stuck in a loop"
+
+1. Stop the agent
+2. Open the task
+3. Press **E**, clarify the prompt with more context
+4. Press **S** → `todo`
+5. Start agent again
+
+If this pattern repeats, the self-monitor will flag the task and suggest a prompt change.
+
+### "Agent made changes I want to abandon"
+
+1. Stop the agent
+2. Open Projects → the project → Worktrees
+3. Delete the worktree for this task
+
+Sybra removes the branch on the next fetch cycle if it has no remote.
+
+### "Two agents must coordinate"
+
+They can't directly. Use workflows with `needs_worktree: true` and sequential `run_agent` steps so each sees the previous agent's commits.

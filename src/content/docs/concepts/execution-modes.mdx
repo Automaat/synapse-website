@@ -1,0 +1,113 @@
+---
+title: Execution modes
+description: Interactive (tmux) vs headless (claude -p). When to pick which, and how each works.
+---
+
+Sybra runs Claude Code in one of two modes per agent. The choice determines how you interact with the agent, how output is captured, and how tool approvals work.
+
+## Headless — `claude -p`
+
+The default. Best for scripted, unambiguous work.
+
+```
+claude -p "<prompt>" \
+  --output-format stream-json \
+  [--resume <session_id>] \
+  [--allowedTools "<tools>"]
+```
+
+Sybra spawns the process, reads stdout line-by-line as NDJSON, and emits UI events for every turn.
+
+### Characteristics
+
+- **Non-interactive**. No TTY. No keyboard input after start.
+- **Token-accurate**. `result` events include cost, input tokens, output tokens, duration.
+- **Resumable**. The `session_id` from the `init` event can be passed to `--resume`.
+- **Programmable tool approval**. When `require_permissions: true`, Sybra pauses the agent on `tool_use` and asks you to approve via the UI.
+- **Empty `allowed_tools: []`** grants all tools and passes `--dangerously-skip-permissions`. Use deliberately.
+
+### When to pick it
+
+- The task is well-specified (a GitHub issue, a debugged bug report, a Renovate PR fix).
+- You want the agent to run while you're offline or in the shower.
+- You want cost attribution per run.
+- The orchestrator is dispatching on its own.
+
+## Interactive — tmux
+
+For ambiguous, exploratory work where you want to join the session and talk to the agent.
+
+```
+tmux new-session -d -s sybra-<task_id> -x 200 -y 50 "claude"
+```
+
+Sybra creates a detached tmux session. The UI polls `tmux capture-pane -t sybra-<id> -p` every few seconds to show a live preview.
+
+### Characteristics
+
+- **Attachable**. `tmux attach -t sybra-<id>` from any terminal to join the live session.
+- **Full Claude Code TUI**. Slash commands, multi-line input, file pickers — everything you'd expect from a native Claude Code session.
+- **Preview-only from Sybra**. Sybra shows the last frame of the pane; real interaction happens in your terminal.
+- **No token accounting**. Interactive sessions don't emit stream-json, so per-run cost is unknown until the session ends (if at all).
+- **Manual status**. You drive the status lifecycle yourself. Sybra will not auto-transition.
+
+### When to pick it
+
+- The task is ambiguous or requires back-and-forth ("we need to decide the API shape together").
+- You want to pair-program with the agent.
+- You need to approve/reject many decisions and want lower latency than the UI's approval modal.
+- You're debugging something weird that needs `bash` commands interleaved with reasoning.
+
+## Decision guide
+
+| Situation | Pick |
+|---|---|
+| Renovate PR CI is red | headless |
+| Bug with a reliable repro | headless |
+| Architect-level design that needs your taste | interactive |
+| Orchestrator dispatches at 03:00 | headless |
+| Novel refactor with unclear boundaries | interactive |
+| Loop agents | headless (required) |
+
+## Mode in task frontmatter
+
+The `agent_mode` field on each task sets the default mode. Workflows can override it per step.
+
+```yaml
+agent_mode: headless   # default
+```
+
+You can change mode at any time before dispatch. After dispatch, mode is locked to that agent run.
+
+## Tool approval
+
+Headless runs support three approval postures:
+
+- **`require_permissions: true`** (default) — Sybra pauses on every `tool_use` and waits for your approval.
+- **`require_permissions: false`** — passes `--dangerously-skip-permissions` to the CLI.
+- **`allowed_tools: ["Read", "Grep", ...]`** — whitelist of tool names; other tools require approval.
+
+![Agent awaiting approval](/screenshots/dark/agent-detail.png)
+
+Interactive mode uses Claude Code's native permission prompts. Sybra does not intercept.
+
+## Provider selection
+
+Independent of mode, each agent runs against one provider:
+
+- **`claude`** — Anthropic's Claude via `claude -p`
+- **`codex`** — OpenAI Codex via a JSONL streaming adapter
+
+Provider is per-machine (set in config). Per-task override is not supported. If a provider is rate-limited, Sybra can auto-failover if `providers.auto_failover: true`.
+
+## What this looks like in practice
+
+```
+# morning
+- Triage: GitHub issue → task_type=debug → agent_mode=headless → orchestrator dispatches
+- Lunch: Design question → task_type=normal → agent_mode=interactive → you attach after lunch
+- Evening: Renovate floods in → workflow routes all to pr-fix agents → headless
+- Overnight: loop agent runs /babysit-prs every 30 min → headless
+```
+
+Mode isn't a philosophy — it's a scheduling knob.

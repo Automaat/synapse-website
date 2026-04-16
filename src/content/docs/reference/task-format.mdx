@@ -1,0 +1,226 @@
+---
+title: Task format reference
+description: Full YAML frontmatter schema for task markdown files.
+---
+
+Tasks are markdown files with YAML frontmatter. One file per task. Location: `~/.sybra/tasks/<id>.md` (or the directory set via `tasks_dir` in config).
+
+## Complete example
+
+```markdown
+---
+id: task-abc123
+slug: add-hello-endpoint
+title: "Add /hello endpoint"
+status: in-progress
+task_type: normal
+agent_mode: headless
+allowed_tools: []
+tags: [backend, small]
+project_id: Automaat/sybra
+branch: feature/hello
+pr_number: 42
+issue: https://github.com/Automaat/sybra/issues/99
+status_reason: "Implementing"
+reviewed: false
+run_role: ""
+todoist_id: "8123456"
+due_date: 2026-04-25T00:00:00Z
+require_permissions: null
+agent_runs:
+  - agent_id: agent-xyz
+    role: plan
+    mode: headless
+    provider: claude
+    state: completed
+    started_at: 2026-04-16T09:10:00Z
+    ended_at: 2026-04-16T09:14:00Z
+    cost_usd: 0.12
+    input_tokens: 2450
+    output_tokens: 1230
+    result: success
+    log_file: ~/.sybra/logs/agent-xyz.ndjson
+    session_id: sess-abc
+workflow:
+  execution_id: exec-def456
+  status: running
+  current_step_id: implement
+created_at: 2026-04-16T09:00:00Z
+updated_at: 2026-04-16T09:15:00Z
+---
+
+## Description
+
+Add a GET /hello endpoint that returns 200 with `{"msg":"world"}`.
+
+## Acceptance criteria
+
+- Returns valid JSON
+- Has a table-driven test
+```
+
+## Field reference
+
+### Identity
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `id` | string | yes | Unique. Typically `task-<6char hash>`. |
+| `slug` | string | no | Human-readable directory suffix when saving to disk |
+| `title` | string | yes | One-line description |
+
+### Status
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `status` | enum | yes | `new` / `todo` / `planning` / `plan-review` / `in-progress` / `in-review` / `human-required` / `done` |
+| `status_reason` | string | no | Human note on why the task is in this status |
+| `reviewed` | bool | no | Has a human reviewed the current agent's output |
+
+### Classification
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `task_type` | enum | no | `normal` / `debug` / `research` / `chat`. Default `normal`. |
+| `tags` | list[string] | no | Free-form strings. Workflow conditions filter on these. |
+| `agent_mode` | enum | no | `headless` / `interactive`. Default from `agent.mode` config. |
+| `allowed_tools` | list[string] | no | Empty list grants ALL tools with skip-permissions. |
+
+### Project link
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `project_id` | string | no | Format `owner/repo`. Must match a registered project. |
+| `branch` | string | no | Branch name. Defaults to `feature/<id>` on agent start. |
+| `pr_number` | int | no | Set by `link_pr_and_review` workflow step |
+| `issue` | string | no | GitHub issue URL. Set when task originated from an issue. |
+
+### Agent execution
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `require_permissions` | bool or null | no | Null = use config default. False = skip-permissions. |
+| `run_role` | string | no | `""`, `triage`, `plan`, `eval`, `pr-fix`. Set by workflows. |
+
+### External IDs
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `todoist_id` | string | no | Source Todoist task ID if task originated there |
+| `due_date` | RFC3339 | no | Synced from Todoist |
+
+### Run history
+
+`agent_runs` is an append-only list. One entry per agent run against this task.
+
+| Field | Type | Notes |
+|---|---|---|
+| `agent_id` | string | In-memory agent ID (stable across restarts via session resume) |
+| `role` | string | `""` / `triage` / `plan` / `eval` / `pr-fix` |
+| `mode` | enum | `headless` / `interactive` |
+| `provider` | string | `claude` / `codex` |
+| `model` | string | Model ID used |
+| `state` | enum | `running` / `completed` / `failed` / `cancelled` |
+| `started_at` | RFC3339 | — |
+| `ended_at` | RFC3339 | Null while running |
+| `cost_usd` | float | Total cost for this run |
+| `input_tokens` | int | — |
+| `output_tokens` | int | — |
+| `result` | string | `success` / `error` / `escalated` / `cancelled` |
+| `log_file` | path | NDJSON log path |
+| `session_id` | string | Claude Code session; usable with `--resume` |
+| `escalation_reason` | string | Set if `result == "escalated"` |
+| `error_kind` | string | Set if `result == "error"` |
+| `error_msg` | string | Human error message |
+
+### Workflow state
+
+| Field | Type | Notes |
+|---|---|---|
+| `workflow.execution_id` | string | Current workflow execution |
+| `workflow.status` | enum | `running` / `completed` / `failed` / `cancelled` |
+| `workflow.current_step_id` | string | Step being executed |
+
+### Timestamps
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `created_at` | RFC3339 | yes | Set on creation, never modified |
+| `updated_at` | RFC3339 | yes | Updated on any frontmatter change |
+
+## Enum reference
+
+### `status`
+
+```
+new → todo → planning → plan-review → in-progress → in-review → done
+                                           ↓
+                                    human-required
+```
+
+### `task_type`
+
+| Value | Intended workflow |
+|---|---|
+| `normal` | `default-feature` |
+| `debug` | `default-debug` |
+| `research` | `default-research` |
+| `chat` | No workflow; ephemeral session |
+
+### `agent_mode`
+
+- `headless` — `claude -p` with NDJSON output
+- `interactive` — tmux session
+
+### Run `role`
+
+- `""` — generic implementation
+- `triage` — classifies and tags the task
+- `plan` — writes an implementation plan
+- `eval` — grades another agent's output
+- `pr-fix` — addresses review comments on a PR
+
+## Parsing
+
+Go:
+
+```go
+import "github.com/Automaat/sybra/internal/task"
+
+t, err := task.Parse("~/.sybra/tasks/task-abc123.md")
+```
+
+CLI:
+
+```bash
+sybra-cli get task-abc123 --json
+```
+
+## Creating tasks manually
+
+```markdown
+---
+id: task-manual01
+title: "Refactor auth module"
+status: new
+task_type: normal
+agent_mode: headless
+tags: [backend, refactor, medium]
+project_id: Automaat/sybra
+created_at: 2026-04-16T10:00:00Z
+updated_at: 2026-04-16T10:00:00Z
+---
+
+## Description
+
+The auth module is tightly coupled to the HTTP layer. Extract a
+pure domain package and wire the HTTP handlers to it.
+```
+
+Drop that in `~/.sybra/tasks/task-manual01.md`. Sybra's fsnotify watcher picks it up within a second. No restart needed.
+
+## Editing tasks manually
+
+Edit the file. Save. Sybra reloads. The `updated_at` field is not auto-set on manual edits — update it if order-in-list matters.
+
+If an agent is running, be careful: status changes while the agent is live may confuse workflows. Prefer GUI edits during active runs.

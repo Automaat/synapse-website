@@ -1,0 +1,44 @@
+---
+title: Sybra
+description: A local desktop app that orchestrates Claude Code agents. Markdown-native, tmux-friendly, swarm-ready.
+---
+
+Sybra is a local desktop app that runs a swarm of Claude Code agents against your own repositories. Tasks live as markdown files on disk. Agents run headlessly via `claude -p` or interactively inside tmux. The whole loop — triage, plan, dispatch, review — is yours to automate or drive by hand.
+
+![Dashboard](/screenshots/dark/dashboard.png)
+
+## What you get
+
+- **Kanban task board** backed by plain markdown files. Git-tracked. Diff-friendly.
+- **Two agent modes**: interactive (tmux) for conversational work, headless (`claude -p`) for scripted work.
+- **Per-task git worktrees**. Each agent gets its own checkout, cleaned up on completion.
+- **Orchestrator brain**. A Claude Code session that triages, plans, dispatches, and monitors the swarm.
+- **GitHub integration**. Issues feed the board. PRs, reviews, and Renovate CI live in-app.
+- **Workflows**. A visual DAG editor for multi-step pipelines (plan → review → fix → merge).
+- **Loop agents**. Cron-like recurring headless jobs with full cost tracking.
+- **Per-machine routing**. Run Sybra on a laptop and a server simultaneously, route work by project type.
+
+## Who it's for
+
+You already use Claude Code. You want one place to see what every agent is doing, what it cost, where it's stuck, and what's next — without a VC-funded SaaS in the loop.
+
+## How tasks move
+
+```
+new → todo → in-progress → in-review → done
+              ↑
+      (planning → plan-review) — for tasks needing architect-level review first
+```
+
+Tasks enter through GitHub issues, Todoist, the CLI, the Quick-Add hotkey, or the task board. The orchestrator picks them up, picks a mode, picks a provider, and runs.
+
+## Where to go next
+
+- **New here?** → [Getting started](/getting-started/) (5 minutes, you run a real agent)
+- **Mental model?** → [Tasks and agents](/concepts/tasks-and-agents/)
+- **Just reference?** → [CLI](/reference/cli/) · [Config](/reference/config/) · [Shortcuts](/reference/keyboard-shortcuts/)
+
+## Related
+
+- Source: [`github.com/Automaat/sybra`](https://github.com/Automaat/sybra)
+- The app embeds a Wails v2 GUI. `mise run dev` hot-reloads both Go and Svelte.

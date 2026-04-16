@@ -1,0 +1,149 @@
+---
+title: GitHub integration
+description: Pull issues as tasks, manage PRs, fix Renovate CI, and run code reviews inside Sybra.
+---
+
+Sybra talks to GitHub through the `gh` CLI and GraphQL. No OAuth app, no webhook server — Sybra reuses your local `gh auth` token.
+
+Enable it in config:
+
+```yaml
+github:
+  enabled: true
+```
+
+![GitHub page](/screenshots/dark/github-issues.png)
+
+The tab has four views: **Issues**, **My PRs**, **Reviews**, **Renovate**.
+
+## Issues → tasks
+
+![GitHub issues](/screenshots/dark/github-issues.png)
+
+Sybra periodically queries issues assigned to your GitHub user across all registered projects. For each issue:
+
+- Shows number, title, labels, repository
+- If already linked to a Sybra task, shows the task ID
+- Otherwise offers **Create task**
+
+**Create task** generates a task with:
+
+- `title` from issue title
+- `body` from issue body
+- `issue:` pointing to the issue URL
+- `project_id` matching the repo
+- `tags` inferred from issue labels
+
+Once created, the orchestrator triages normally.
+
+## My PRs
+
+![My PRs](/screenshots/dark/github-my-prs.png)
+
+Lists PRs authored by your user across registered projects. Per PR:
+
+- Status (open, draft, merged, closed)
+- CI state (passing, failing, pending)
+- Review state (approved, changes requested, pending)
+- Linked Sybra task, if any
+
+Click a PR to open detail view:
+
+![PR detail](/screenshots/dark/github-pr-detail.png)
+
+Actions per PR:
+
+- **Mark ready** — flips a draft PR to ready-for-review
+- **Fix CI** — dispatches a headless agent on the PR's branch to fix red CI
+- **Request review** — requests a review from the configured reviewers
+- **Merge** — merges via GraphQL (respects branch protection)
+
+## Reviews
+
+![Reviews](/screenshots/dark/github-reviews.png)
+
+PRs awaiting your review, across all projects. From here you can dispatch a review agent:
+
+![Reviews — plan selected](/screenshots/dark/reviews-plan-selected.png)
+
+The review agent:
+
+1. Checks out the PR branch in a worktree
+2. Runs static analysis (per-project configured linters/tests)
+3. Reads the diff and emits review comments
+4. Posts them to GitHub as a pending review
+
+You get a chance to edit before submitting. The agent's output is a *proposal*, not an auto-approval.
+
+### Inline comments
+
+Add comments on specific lines in the diff view. Resolve or delete individually. Comments persist until resolved.
+
+### Accept the agent's review
+
+Click **Submit review**. Sybra posts to GitHub with your account. You decide approve / request-changes / comment.
+
+## Renovate
+
+![Renovate](/screenshots/dark/github-renovate.png)
+
+Renovate integration is opt-in:
+
+```yaml
+renovate:
+  enabled: true
+  author: "app/renovate"     # or your Renovate Bot username
+```
+
+Renovate PRs show inline with CI state. Per-row actions:
+
+- **Approve** — posts an approval review
+- **Merge** — merges the PR
+- **Rerun checks** — re-triggers failing workflows
+- **Fix CI** — dispatches a headless agent to fix red CI
+
+### Auto-merge rules
+
+If your config enables renovate.enabled and the Monitor is running, Renovate PRs that go green can auto-merge. Configure the rules per project via GitHub branch protection — Sybra respects GitHub's decisions.
+
+### Fix CI with an agent
+
+`Fix CI` on a failing Renovate PR:
+
+1. Creates a Sybra task of type `normal`, with `run_role: pr-fix`
+2. Dispatches a headless agent in a worktree on the PR's branch
+3. Agent pulls CI logs, identifies the failure, edits code, pushes
+4. On green CI, the watchdog marks the PR mergeable
+
+## PR detail page
+
+Clicking any PR (from My PRs, Reviews, or Renovate) opens the unified PR detail page. It shows:
+
+- Diff with inline comments
+- Checks state with raw log tails
+- Linked task (if any)
+- Actions appropriate to your relationship with the PR (author vs reviewer)
+
+## Config reference
+
+```yaml
+github:
+  enabled: true
+
+renovate:
+  enabled: true
+  author: "app/renovate"     # bot username that authors Renovate PRs
+
+monitor:
+  issue_repo: "Automaat/sybra"   # where the monitor posts meta issues
+  issue_label: "monitor"
+```
+
+## What Sybra never does
+
+- Never force-pushes without your explicit instruction
+- Never merges PRs that don't pass branch protection
+- Never auto-opens PRs without a `run_agent` step that ends in `link_pr_and_review`
+- Never edits commit history (no rebase, no amend, no `--force`) unless you prompt the agent to
+
+This is deliberate. GitHub is the source of truth; Sybra is a polite client.

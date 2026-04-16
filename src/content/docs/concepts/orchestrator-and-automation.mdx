@@ -1,0 +1,138 @@
+---
+title: Orchestrator and automation
+description: The orchestrator brain, auto-triage, the monitor, the self-monitor, and per-machine routing.
+---
+
+Sybra is a swarm manager. Left to its defaults, it will triage incoming work, plan complex tasks, dispatch agents, babysit them, and page you only when it's stuck. This page explains the machinery.
+
+## The orchestrator brain
+
+A long-running Claude Code session whose job is to manage the swarm — not do the work.
+
+![Orchestrator console](/screenshots/dark/agents-orchestrator.png)
+
+It reads `~/.sybra/CLAUDE.md` (synced from the Sybra repo's `orchestrator/CLAUDE.md`) at start. That file is the entire brain — system prompt, triage rules, dispatch logic, escalation criteria.
+
+### What it does
+
+- **Triage cycle**. Scans `new` tasks, classifies them (type, tags, mode, project), moves them to `todo`.
+- **Plan cycle**. For `medium`/`large` work tasks, dispatches a planning agent, then a plan-critic agent, then waits for your approval.
+- **Dispatch cycle**. Respects `agent.max_concurrent`. Picks the next ready task and starts an agent.
+- **Monitor cycle**. Notices stalled runs, too-costly runs, repeated failures. Kills or escalates.
+- **Escalation**. When unsure, posts a comment to a tracked GitHub issue or flips the task to `human-required`.
+
+The orchestrator is **conversational**. You can type into its console. It respects messages as signals without reinterpreting them as tasks.
+
+### When the orchestrator is off
+
+Triage, planning, and dispatch don't happen automatically. You drive the board by hand: press `S` to move status, click **Start agent** to dispatch. Useful for focused sessions where you want deterministic behavior.
+
+## Automation knobs
+
+Five independent workers. All live in the main Sybra process. Each has an `enabled` switch so a single machine can run only what it should.
+
+| Worker | Config key | What it does |
+|---|---|---|
+| Orchestrator | — | The conversational brain above |
+| Triage poller | `triage.enabled` | Auto-classifies new tasks without the orchestrator |
+| Monitor | `monitor.enabled` | Anomaly detection + auto-remediation |
+| SelfMonitor | `self_monitor.enabled` | Post-hoc judge of agent/workflow quality |
+| Provider health | `providers.health_check.enabled` | Probes Claude/Codex status for auto-failover |
+
+### The monitor
+
+A lightweight in-process loop that runs every `monitor.interval_seconds`. Detects:
+
+- Lost agents (running longer than `lost_agent_minutes`)
+- Stuck human-required tasks (older than `stuck_human_hours`)
+- Bottleneck columns (tasks held in a status past `bottleneck_hours`)
+- Repeated failure rate above `failure_rate_threshold`
+
+On detection, it posts a GitHub issue with the `monitor.issue_label` to `monitor.issue_repo`, or dispatches a remediation agent if the pattern is known.
+
+### The self-monitor
+
+Runs on an hourly cadence. Its purpose is to learn from past runs, not to fix live ones. Uses a "judge → synthesizer" split:
+
+- **Judge** (fast model, default Haiku) scores recent runs on a rubric.
+- **Synthesizer** (strong model, default Sonnet) batches findings into a report.
+- **Ledger** at `~/.sybra/selfmonitor/ledger.jsonl` records every finding with suppression keys so the same issue isn't reported twice in `suppression_days`.
+
+Auto-actions (when `dry_run: false`) can re-triage, kill runaway loops, flag cost outliers.
+
+## Loop agents
+
+Recurring headless jobs. Persisted per-machine in `~/.sybra/loop-agents/<id>.yaml`.
+
+![Loops page](/screenshots/dark/agents-loops.png)
+
+Each loop agent has its own schedule, prompt, allowed tools, model, and `enabled` flag.
+
+```yaml
+id: loop-babysit-prs
+name: Babysit PRs
+prompt: |
+  Review PRs with failing CI. Merge green ones. Flag conflicts.
+interval_sec: 1800
+allowed_tools: [Bash, Read, Grep, WebFetch]
+provider: claude
+model: sonnet
+enabled: true
+last_run_at: 2026-04-16T09:30:00Z
+last_run_cost: 0.14
+```
+
+![Create loop agent](/screenshots/dark/agents-loops-new-dialog.png)
+
+`interval_sec` has a floor of 60. The loop scheduler is a single ticker — loops don't run concurrently with each other on the same machine, but they run concurrently with normal agents.
+
+## Per-machine routing
+
+Sybra runs on laptops and servers. Two axes prevent duplicate work when two machines watch the same task directory (via a shared NFS or a remote Sybra server).
+
+### Axis 1 — feature kill switches
+
+Every auto-task source has an `enabled` flag. A laptop that doesn't want to handle Renovate sets `renovate.enabled: false`. A server with no Todoist credentials sets `todoist.enabled: false`.
+
+### Axis 2 — project type allowlist
+
+The top-level `project_types:` list declares what project types this machine handles. Empty = all.
+
+```yaml
+# server config
+project_types: [pet]
+todoist:  { enabled: true, api_token: "..." }
+github:   { enabled: true }
+renovate: { enabled: true }
+```
+
+```yaml
+# laptop config
+project_types: [work]
+todoist:  { enabled: false }
+github:   { enabled: true }
+renovate: { enabled: true }
+```
+
+All project-scoped automations (triage, dispatch, monitor, workflows) filter through the `cfg.AllowsProjectType(...)` helper. A task tied to a `work`-type project on the server above will never dispatch there — only on the laptop.
+
+On startup Sybra logs an `app.automations` summary so you can eyeball the role of each instance.
+
+## The Claude Code orchestrator cron (external)
+
+The orchestrator brain lives inside Sybra. There's also an **external** orchestrator: a `/sybra-monitor` Claude Code cron you schedule via the `schedule` skill. It's optional, runs outside Sybra, and reads the state over the HTTP API (if `sybra-server` is exposed).
+
+Manage it independently per machine. Sybra does not own its lifecycle.
+
+## Summary
+
+Sybra's automation is layered. Pick what fits your day:
+
+| Layer | When to use |
+|---|---|
+| Hand-driven board | Focused deep work, one task at a time |
+| Triage poller | Incoming work through Todoist / GitHub issues |
+| Orchestrator brain | You want decisions explained and logged conversationally |
+| Loop agents | Known recurring chores |
+| Monitor | Small op-team of one that needs watchdogs |
+| SelfMonitor | You care about continuous improvement, not just uptime |

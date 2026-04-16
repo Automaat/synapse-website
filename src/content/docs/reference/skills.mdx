@@ -1,0 +1,112 @@
+---
+title: Claude Code skills
+description: Skills shipped by Sybra, what each does, and how the sync works.
+---
+
+Sybra ships project-local Claude Code skills in the repo's `.claude/skills/` directory. On app startup, these are synced to `~/.claude/skills/` so any Claude Code session can use them.
+
+## Shipped skills
+
+### `sybra-tasks`
+
+Task CRUD via `sybra-cli`. Use from Claude Code with:
+
+```
+/sybra-tasks
+```
+
+Capabilities:
+
+- List tasks by status, tag, project
+- Create tasks with title, body, mode, tags
+- Update task status, body, tags
+- Delete tasks
+- All via `sybra-cli --json` for machine parsing
+
+### `sybra-triage`
+
+Opinionated triage workflow.
+
+```
+/sybra-triage
+```
+
+Runs through `new` tasks, proposes a classification for each (type, tags, mode, project), asks you to confirm, applies changes.
+
+### `plan-critic`
+
+Multi-persona plan review. Triggers on "review this plan", "critique this plan", "is this plan good".
+
+Spawns parallel subagents (Skeptic, Architect, Verifier), returns a verdict (Approve / Reject / Refine) with refinements.
+
+## The sync
+
+On app start, Sybra runs `syncSkills()` in `app.go`:
+
+1. Read every directory under `.claude/skills/` in the Sybra repo
+2. For each, copy to `~/.claude/skills/<name>/` (overwriting)
+3. Copy `orchestrator/CLAUDE.md` to `~/.sybra/CLAUDE.md` (the orchestrator brain)
+
+The sync is one-way. Edits to `~/.claude/skills/sybra-*` are overwritten on next start. Edit the source in the Sybra repo instead.
+
+## Skill file structure
+
+```
+.claude/skills/<skill-name>/
+├── SKILL.md                    # The skill definition (YAML frontmatter + prose)
+├── README.md                   # Optional — for humans
+└── scripts/                    # Optional — invoked by the skill
+```
+
+### `SKILL.md` frontmatter
+
+```yaml
+---
+name: sybra-tasks
+description: Task CRUD for Sybra via sybra-cli.
+---
+```
+
+The `description` is what Claude Code uses to decide whether to invoke the skill. Be specific — vague descriptions trigger in the wrong contexts.
+
+## Writing your own skill
+
+To add a skill to the Sybra-synced set:
+
+1. Create a directory under `.claude/skills/<your-skill>/`
+2. Write `SKILL.md` with frontmatter + instructions
+3. Commit to the Sybra repo
+4. On next app start, it syncs to `~/.claude/skills/`
+
+Skills are Markdown. No special format beyond the frontmatter. Claude Code loads the full content when the skill is triggered.
+
+## The orchestrator brain
+
+The orchestrator's system prompt lives at `orchestrator/CLAUDE.md` in the Sybra repo. On app start, it's copied to `~/.sybra/CLAUDE.md`.
+
+The orchestrator's conversational loop starts Claude Code with `--working-directory ~/.sybra/` so this CLAUDE.md loads as project context.
+
+The file covers:
+
+- Triage rules (type, tags, mode, project assignment)
+- Dispatch logic (when to start an agent, concurrency)
+- Monitoring (what to flag, when to escalate)
+- Failure handling (retry vs escalate)
+- Escalation criteria (cost, turns, repeated errors)
+- Communication patterns (how to ask clarifying questions)
+
+Edit this file to change the orchestrator's behavior. Changes take effect on next orchestrator restart — click **Stop** then **Start** on the Orchestrator page.
+
+## Where skills come from
+
+- **Sybra-shipped**: `.claude/skills/` in the Sybra repo → synced on start
+- **Claude Code global**: `~/.claude/skills/` — user skills, survive Sybra sync (only `sybra-*` and listed below get overwritten)
+- **Project-local**: `<project>/.claude/skills/` — skills visible only when Claude Code runs in that project
+
+Sybra only manages the first. The others are untouched.
+
+## Which get overwritten
+
+By default, only directories with names matching Sybra-shipped skills are overwritten. Custom skills in `~/.claude/skills/` are preserved.
+
+To audit: check the sync log line on startup in `~/.sybra/logs/sybra.log`. Each synced skill is listed.

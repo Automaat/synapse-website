@@ -1,0 +1,114 @@
+---
+title: Dashboard and stats
+description: Read the dashboard signals. Use stats to tune your agent budgets and workflow design.
+---
+
+Two pages for the same question: "is the swarm healthy and affordable?"
+
+## Dashboard
+
+![Dashboard](/screenshots/dark/dashboard.png)
+
+Your landing page. Shows:
+
+- **Running agents** — live count, per-mode
+- **Task status breakdown** — how many in each column
+- **Today's cost** — rolling 24h total across all agents
+- **Draft PRs** — PRs waiting for you to mark ready
+- **Renovate PRs** — count awaiting action
+- **Recent agent runs** — last 10 completed runs with cost
+
+Everything is clickable. Every number is a filtered view.
+
+### Signals to watch
+
+- `human-required` climbing → the orchestrator is escalating more than usual; either a bad run of tasks or a config drift
+- Today's cost spiking → check for a runaway agent on Agents page
+- `in-review` static for days → reviewers (you) are the bottleneck
+
+## Stats
+
+![Stats](/screenshots/dark/stats.png)
+
+Deeper metrics. Aggregated from the audit log and stats.json.
+
+### Default view
+
+Running totals:
+
+- Lifetime cost
+- Total agent runs
+- Pass / fail ratio
+- Average cost per task
+- Most expensive tasks (top 10)
+
+### This week
+
+![Stats — this week](/screenshots/dark/stats-this-week.png)
+
+Seven-day window. Use for:
+
+- Weekly cost review (set a budget, watch the trend)
+- Throughput tracking (tasks completed per day)
+- Regression detection (fail rate going up over time)
+
+### Per-project
+
+Toggle the project dropdown. Stats filter to one project:
+
+- Hours of agent time
+- Cost
+- Pass rate
+- Mean time in each status
+
+Useful when one project is dominating your budget.
+
+## Cost attribution
+
+Every `result` event from a headless agent includes cost and tokens. Sybra sums these into:
+
+- Per agent run (`agent_runs[].cost_usd` on each task)
+- Per task (rollup of all runs)
+- Per day (`~/.sybra/stats.json`)
+- Per month (rolled over at UTC midnight)
+
+Interactive (tmux) sessions don't emit `result` events. Their cost is unknown. If you use interactive mode heavily, stats understate your real spend.
+
+## Set a monthly budget
+
+In `~/.sybra/config.yaml`:
+
+```yaml
+agent:
+  max_cost_usd: 5.0   # per-run ceiling
+```
+
+No global monthly cap exists — Sybra only enforces per-run. Set per-run low (e.g. `$0.50`) and let escalations surface when tasks need more.
+
+## Export stats
+
+CLI:
+
+```bash
+sybra-cli audit --days 7 --json > week.json
+```
+
+The audit log is append-only NDJSON at `~/.sybra/logs/audit/YYYY-MM-DD.ndjson`. One entry per agent run and task change.
+
+## Read the raw audit log
+
+```bash
+tail -f ~/.sybra/logs/audit/$(date -u +%Y-%m-%d).ndjson | jq .
+```
+
+Events include `type`, `task_id`, `agent_id`, `cost_delta`, `tokens`, `message`.
+
+## Respond to anomalies
+
+When a task's cost exceeds p95 of similar tasks, the self-monitor flags it. You'll see it on Dashboard's "Recent agent runs" with an outlier badge. Click through to see:
+
+- Why it was flagged (cost, turns, repeated failures)
+- The run transcript
+- Suggested corrective action (tighten prompt, lower max_turns, etc.)
+
+Acting on these is how the swarm gets cheaper over time.

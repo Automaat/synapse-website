@@ -1,0 +1,91 @@
+---
+title: Review code
+description: Dispatch review agents, add inline comments, and submit reviews to GitHub.
+---
+
+Sybra turns code review into a two-step loop: an agent drafts a review, you edit and submit.
+
+![Reviews](/screenshots/dark/reviews.png)
+
+## Where reviews come from
+
+The Reviews tab lists PRs where you're a requested reviewer, across all registered projects. Sources:
+
+- GitHub "review requested from you"
+- Tasks in `in-review` status with a linked PR
+- PRs opened by Sybra agents on your behalf
+
+## Dispatch a review agent
+
+Click **Start review** on any row. Optionally pick a review plan (different rubrics for different projects).
+
+![Reviews — plan selected](/screenshots/dark/reviews-plan-selected.png)
+
+The agent:
+
+1. Creates a worktree on the PR branch
+2. Runs configured static analysis (linters, tests)
+3. Reads the diff end-to-end
+4. Emits inline comments as pending review
+
+Meanwhile you keep working. The agent usually finishes in 2–5 minutes on a typical PR.
+
+## Edit the draft review
+
+When the agent finishes, the PR detail view shows the draft review.
+
+![PR detail](/screenshots/dark/github-pr-detail.png)
+
+For each comment:
+
+- **Keep** — include in the submitted review
+- **Edit** — refine the wording
+- **Delete** — drop it
+
+Add your own comments with the inline **+** button next to any diff line.
+
+## Submit the review
+
+Click **Submit review**. Choose a verdict:
+
+- **Approve** — LGTM
+- **Request changes** — block merge
+- **Comment** — neutral
+
+Sybra posts to GitHub as your user. You own the review — the agent just drafted it.
+
+## Fix comments on your own PR
+
+If the review is on a PR you authored, Sybra offers **Start fix-review agent**. This dispatches a new headless agent:
+
+1. Reads every unresolved comment
+2. Makes targeted fixes per comment
+3. Pushes new commits
+4. Resolves the comments
+
+Useful when a reviewer leaves 15 nits and you don't want to address them by hand.
+
+## Resolve comments
+
+On your own PRs, click **Resolve** on any comment. Sybra marks it resolved in GitHub. The fix-review agent also auto-resolves as it pushes fixes.
+
+## Review plans
+
+A review plan is a named rubric. Different projects want different checks:
+
+- Library project — "focus on API stability, backward compatibility, JSDoc on public methods"
+- CLI project — "focus on user-facing output, flag consistency, help text"
+- Infra project — "focus on drift, state safety, production risk"
+
+Plans live in config. Ship the ones you reuse.
+
+## Mark PR ready
+
+For draft PRs: click **Mark PR ready**. Sybra flips the PR from draft → ready-for-review on GitHub. Useful at the end of a fix-review cycle.
+
+## What the review agent does NOT do
+
+- Never approves on your behalf — you submit
+- Never force-pushes the PR branch — only commits additions
+- Never closes the PR — merging is always your decision (or GitHub branch protection's)
+- Never modifies `.github/` workflows — too dangerous; require explicit instruction

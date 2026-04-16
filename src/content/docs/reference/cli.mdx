@@ -1,0 +1,266 @@
+---
+title: CLI reference
+description: Complete command reference for sybra-cli, sybra-server, and sybra-perf.
+---
+
+Sybra ships three binaries:
+
+- `sybra-cli` — task / project CRUD and diagnostics
+- `sybra-server` — HTTP API daemon for headless deployments
+- `sybra-perf` — benchmarking and performance tests
+
+All binaries respect the same `~/.sybra/config.yaml` as the GUI.
+
+---
+
+## `sybra-cli`
+
+```
+sybra-cli [--json] <command> [flags]
+```
+
+`--json` emits machine-readable output (used by Claude Code skills).
+
+### Tasks
+
+#### `list`
+
+```
+sybra-cli list [--status STATUS] [--tag TAG] [--project PROJECT]
+```
+
+Filters combine with AND. Empty = all tasks.
+
+**Examples**
+
+```bash
+sybra-cli list --status todo
+sybra-cli list --tag backend --status in-progress
+sybra-cli list --project Automaat/sybra --json
+```
+
+#### `get`
+
+```
+sybra-cli get <id>
+```
+
+Prints the full markdown file with frontmatter.
+
+#### `create`
+
+```
+sybra-cli create \
+  --title TITLE \
+  [--body BODY] \
+  [--mode MODE] \
+  [--type TYPE] \
+  [--tags T1,T2] \
+  [--project PROJECT_ID] \
+  [--branch BRANCH] \
+  [--pr PR_NUMBER] \
+  [--issue URL]
+```
+
+| Flag | Default | Values |
+|---|---|---|
+| `--mode` | `headless` | `headless` / `interactive` |
+| `--type` | `normal` | `normal` / `debug` / `research` / `chat` |
+| `--tags` | none | comma-separated |
+| `--project` | none | `owner/repo` |
+
+Returns the new task ID on stdout.
+
+#### `update`
+
+```
+sybra-cli update <id> \
+  [--title T] \
+  [--status S] \
+  [--body B] \
+  [--mode M] \
+  [--tags T] \
+  [--project P]
+```
+
+Null/missing flags preserve existing values.
+
+#### `delete`
+
+```
+sybra-cli delete <id>
+```
+
+Removes the markdown file. If the task has a live agent, the agent is killed first.
+
+### Projects
+
+#### `project list`
+
+```
+sybra-cli project list
+```
+
+#### `project get`
+
+```
+sybra-cli project get <id>
+```
+
+#### `project create`
+
+```
+sybra-cli project create --url <github-url> [--type TYPE]
+```
+
+Clones the repo as a bare mirror.
+
+#### `project delete`
+
+```
+sybra-cli project delete <id>
+```
+
+Removes the bare clone, all worktrees, and the descriptor YAML.
+
+### Diagnostics
+
+#### `audit`
+
+```
+sybra-cli audit [--days N] [--task ID]
+```
+
+Dumps audit log entries. `--days 7` for the last week.
+
+#### `board`
+
+```
+sybra-cli board
+```
+
+ASCII-art kanban view of the current board. Useful in SSH sessions.
+
+#### `health`
+
+```
+sybra-cli health
+```
+
+Prints the current health report: running agents, stuck tasks, provider status.
+
+#### `triage`
+
+```
+sybra-cli triage [--dry-run]
+```
+
+Runs one triage cycle. With `--dry-run`, prints proposed actions without applying.
+
+#### `monitor`
+
+```
+sybra-cli monitor [--dry-run]
+```
+
+Runs one monitor cycle (anomaly detection).
+
+#### `selfmonitor`
+
+```
+sybra-cli selfmonitor scan
+sybra-cli selfmonitor ledger [--limit N]
+```
+
+- `scan` — runs the self-monitor judge + synthesizer once
+- `ledger` — prints the last N entries from `~/.sybra/selfmonitor/ledger.jsonl`
+
+---
+
+## `sybra-server`
+
+HTTP API daemon. Use for deploying Sybra headlessly on a server.
+
+```
+sybra-server [--port 8080] [--config ~/.sybra/config.yaml]
+```
+
+| Flag | Default | Notes |
+|---|---|---|
+| `--port` | `8080` | HTTP listen port |
+| `--config` | `~/.sybra/config.yaml` | Config file path |
+
+The server exposes REST endpoints mirroring Wails bound methods. It does NOT ship a GUI — use the desktop app against the server's API, or query it directly.
+
+### Endpoints
+
+- `GET /api/tasks` — list tasks
+- `POST /api/tasks` — create task
+- `GET /api/tasks/:id` — get task
+- `PATCH /api/tasks/:id` — update task
+- `DELETE /api/tasks/:id` — delete task
+- `GET /api/agents` — list agents
+- `POST /api/agents/:id/messages` — send message
+- `GET /api/projects` — list projects
+- `GET /api/health` — liveness + config summary
+- `GET /events` — Server-Sent Events stream of all Wails events
+
+### Auth
+
+Single bearer token in `~/.sybra/config.yaml`:
+
+```yaml
+server:
+  bearer_token: <random-string>
+```
+
+Absent token = unauthenticated (localhost only; the server refuses to bind external interfaces without a token).
+
+### Deployment
+
+Ship as a Docker image. Reference stack at `home-nas/ansible/docker-compose/synapse-stack.yml` (see Sybra's CLAUDE.md).
+
+---
+
+## `sybra-perf`
+
+Benchmarks the internals. For developers tuning Sybra itself.
+
+```
+sybra-perf [subcommand]
+```
+
+Subcommands (all take optional `--iters N`):
+
+- `stream-parse` — NDJSON parser throughput
+- `task-parse` — frontmatter parse/marshal roundtrip
+- `worktree` — worktree create/destroy latency
+- `audit-append` — audit log append throughput
+
+Not for end users. Kept for regression testing.
+
+---
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Success |
+| `1` | Generic error |
+| `2` | Invalid arguments or config |
+| `3` | Task/project not found |
+| `4` | Unauthorized (server only) |
+| `5` | Provider (Claude/Codex) unavailable |
+
+Scripts can rely on `2` meaning "caller mistake", `3+` meaning "environment or state mistake".
+
+---
+
+## Environment variables
+
+| Var | Effect |
+|---|---|
+| `SYBRA_HOME` | Override `~/.sybra/` |
+| `SYBRA_EDITOR` | Editor for "Open in editor" actions (falls back to `$EDITOR`) |
+| `SYBRA_LOG_LEVEL` | Override `logging.level` at runtime |
+| `SYBRA_CONFIG` | Override default config file path |

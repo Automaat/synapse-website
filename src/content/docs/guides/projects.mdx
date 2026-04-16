@@ -1,0 +1,131 @@
+---
+title: Manage projects
+description: Register repos, inspect worktrees, configure sandboxes.
+---
+
+Projects are Sybra's view of your GitHub repositories. Register them once; every task on the board can bind to one.
+
+![Projects](/screenshots/dark/projects.png)
+
+## Register a project
+
+From the Projects page → **New project**. Enter a GitHub URL:
+
+```
+https://github.com/Automaat/sybra
+```
+
+Pick a type (`work`, `pet`, or a custom value). Optionally set setup commands and sandbox resources.
+
+On save, Sybra:
+
+1. Clones the repo as a bare mirror: `~/.sybra/clones/<owner>/<repo>.git`
+2. Writes the YAML descriptor: `~/.sybra/projects/<owner>--<repo>.yaml`
+3. Registers the project in the sidebar
+
+## Inspect a project
+
+Click any project for detail view.
+
+### Tasks tab
+
+![Project tasks](/screenshots/dark/project-detail-tasks.png)
+
+All tasks with `project_id` matching this project, grouped by status. Click through to any task.
+
+### Worktrees tab
+
+![Project worktrees](/screenshots/dark/project-detail-worktrees.png)
+
+Every active worktree for this project. Each row shows:
+
+- Task ID (click to open the task)
+- Branch name
+- Worktree path
+- **Open in terminal**
+- **Open in editor**
+
+Worktrees are created on agent start and removed when an agent completes with no commits. You rarely need to touch this page — use it to dig into an agent's work-in-progress or to recover from a crashed run.
+
+### Sandbox tab
+
+![Project sandbox](/screenshots/dark/project-detail-sandbox.png)
+
+Per-project container limits and pre-installed features (used when agents run in sandboxed mode):
+
+```yaml
+sandbox_config:
+  memory_mb: 4096
+  cpus: 2
+  features: [docker, node, go]
+```
+
+Features are shorthand for toolchains available in the sandbox image. Customize in `~/.sybra/projects/<owner>--<repo>.yaml`.
+
+## Setup commands
+
+Run after worktree creation, before the agent starts:
+
+```yaml
+setup_commands:
+  - mise install
+  - cd frontend && npm ci
+  - go mod download
+```
+
+Output goes to the agent log. If any command fails (non-zero exit), Sybra aborts the run and marks the task `human-required`.
+
+Keep these idempotent. They run every time an agent starts, including retries.
+
+## Per-machine routing
+
+The `type` field is the routing key. Machines declare what types they accept:
+
+```yaml
+# ~/.sybra/config.yaml on the server
+project_types: [pet]
+
+# ~/.sybra/config.yaml on the laptop
+project_types: [work]
+```
+
+Empty `project_types: []` means "all types". See [Orchestrator and automation → Per-machine routing](/concepts/orchestrator-and-automation/#per-machine-routing).
+
+## Delete a project
+
+From the Projects page → **Delete** (confirm). Sybra:
+
+1. Cancels any running agents on this project
+2. Removes all worktrees
+3. Deletes the bare clone
+4. Removes the descriptor YAML
+
+Tasks tied to the deleted project keep their `project_id` field but lose the link. They'll show up in the board without a project badge.
+
+## Rename a project
+
+GitHub repository renames break the `id` field. Fix in two steps:
+
+1. In the project YAML, update `id` and `clone_url` to the new values
+2. Update existing tasks that reference the old ID:
+
+   ```bash
+   sybra-cli list --json | \
+     jq -r '.[] | select(.project_id == "Automaat/old") | .id' | \
+     xargs -I{} sybra-cli update {} --project Automaat/new
+   ```
+
+Sybra does not auto-follow GitHub redirects. Manual fix is required.
+
+## CLI
+
+All project actions are also available via the CLI:
+
+```bash
+sybra-cli project list
+sybra-cli project get <id>
+sybra-cli project create --url https://github.com/owner/repo --type pet
+sybra-cli project delete owner/repo
+```
+
+See [CLI reference](/reference/cli/#project).
