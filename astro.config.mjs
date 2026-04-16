@@ -4,7 +4,7 @@ import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://synapse.mskalski.dev',
+  site: 'https://sybra.mskalski.dev',
   integrations: [
     starlight({
       title: 'Sybra',
@@ -13,7 +13,7 @@ export default defineConfig({
         src: './public/favicon.svg',
       },
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/automaat/synapse' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/automaat/sybra' },
       ],
       customCss: ['./src/styles/starlight.css'],
       components: {

@@ -8,7 +8,7 @@ Projects connect tasks to real codebases. Sybra clones repos as bare repositorie
 ## Storage layout
 
 ```
-~/.synapse/
+~/.sybra/
 ├── projects/          # YAML metadata per project
 │   └── owner-repo.yaml
 ├── clones/            # bare git repos
@@ -20,12 +20,12 @@ Projects connect tasks to real codebases. Sybra clones repos as bare repositorie
 ## Creating a project
 
 ```sh
-synapse-cli project create --url https://github.com/owner/repo
+sybra-cli project create --url https://github.com/owner/repo
 ```
 
 Or via the GUI: **Projects → Add Project → paste GitHub URL**.
 
-Sybra clones the repo as a bare repository into `~/.synapse/clones/`. The bare clone is the source of truth; worktrees branch off it.
+Sybra clones the repo as a bare repository into `~/.sybra/clones/`. The bare clone is the source of truth; worktrees branch off it.
 
 ## project_id on tasks
 
@@ -37,8 +37,8 @@ project_id: owner/repo
 
 When the agent starts, Sybra automatically:
 
-1. Creates a new branch `synapse/<task-id>` off the default branch
-2. Checks it out as a worktree at `~/.synapse/worktrees/<task-id>/`
+1. Creates a new branch `sybra/<task-id>` off the default branch
+2. Checks it out as a worktree at `~/.sybra/worktrees/<task-id>/`
 3. Sets the agent's working directory to the worktree
 
 On agent completion (or manual cleanup), the worktree is removed. The branch remains for you to review and merge.
@@ -48,7 +48,7 @@ On agent completion (or manual cleanup), the worktree is removed. The branch rem
 Sybra runs a background fetch on registered projects. You can also trigger manually:
 
 ```sh
-synapse-cli project fetch owner/repo
+sybra-cli project fetch owner/repo
 ```
 
 ## project_types
@@ -56,7 +56,7 @@ synapse-cli project fetch owner/repo
 Each machine can declare which project types it handles:
 
 ```yaml
-# ~/.synapse/config.yaml
+# ~/.sybra/config.yaml
 project_types: [pet, oss]
 ```
 

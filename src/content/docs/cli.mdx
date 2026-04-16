@@ -1,9 +1,9 @@
 ---
 title: CLI Reference
-description: Complete reference for the synapse-cli command-line tool.
+description: Complete reference for the sybra-cli command-line tool.
 ---
 
-`synapse-cli` is a standalone binary for task and project CRUD. It reuses the same store and config as the GUI, making it safe to use alongside the running app.
+`sybra-cli` is a standalone binary for task and project CRUD. It reuses the same store and config as the GUI, making it safe to use alongside the running app.
 
 ## Global flags
 
@@ -13,31 +13,31 @@ description: Complete reference for the synapse-cli command-line tool.
 
 ## Tasks
 
-### `synapse-cli list`
+### `sybra-cli list`
 
 ```sh
-synapse-cli list [--status STATUS] [--tag TAG]
+sybra-cli list [--status STATUS] [--tag TAG]
 ```
 
 List tasks. Filters are optional and combinable.
 
 ```sh
-synapse-cli list --status todo
-synapse-cli list --tag backend --json
+sybra-cli list --status todo
+sybra-cli list --tag backend --json
 ```
 
-### `synapse-cli get`
+### `sybra-cli get`
 
 ```sh
-synapse-cli get <id>
+sybra-cli get <id>
 ```
 
 Print a single task (frontmatter + body).
 
-### `synapse-cli create`
+### `sybra-cli create`
 
 ```sh
-synapse-cli create --title TITLE [options]
+sybra-cli create --title TITLE [options]
 ```
 
 | Flag | Default | Description |
@@ -49,17 +49,17 @@ synapse-cli create --title TITLE [options]
 | `--project` | `""` | `owner/repo` project ID |
 
 ```sh
-synapse-cli create \
+sybra-cli create \
   --title "Add rate limiting middleware" \
   --mode headless \
   --tags backend,infra \
   --project myorg/api
 ```
 
-### `synapse-cli update`
+### `sybra-cli update`
 
 ```sh
-synapse-cli update <id> [options]
+sybra-cli update <id> [options]
 ```
 
 | Flag | Description |
@@ -71,36 +71,36 @@ synapse-cli update <id> [options]
 | `--tags` | New tags (replaces existing) |
 
 ```sh
-synapse-cli update task-abc123 --status in-review
+sybra-cli update task-abc123 --status in-review
 ```
 
-### `synapse-cli delete`
+### `sybra-cli delete`
 
 ```sh
-synapse-cli delete <id>
+sybra-cli delete <id>
 ```
 
 Permanently deletes the task file. Running agents are not stopped automatically.
 
 ## Projects
 
-### `synapse-cli project list`
+### `sybra-cli project list`
 
 List all registered projects.
 
-### `synapse-cli project get <id>`
+### `sybra-cli project get <id>`
 
 Print project metadata.
 
-### `synapse-cli project create`
+### `sybra-cli project create`
 
 ```sh
-synapse-cli project create --url https://github.com/owner/repo [--type TYPE]
+sybra-cli project create --url https://github.com/owner/repo [--type TYPE]
 ```
 
 Clones the repo as a bare repository and registers it.
 
-### `synapse-cli project delete <id>`
+### `sybra-cli project delete <id>`
 
 Remove a project registration and its bare clone.
 

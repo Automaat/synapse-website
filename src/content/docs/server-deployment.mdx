@@ -8,18 +8,18 @@ Sybra runs headless (no GUI) as a Docker container, ideal for a home server or V
 ## Docker Compose
 
 ```yaml
-# /opt/synapse/docker-compose.yml
+# /opt/sybra/docker-compose.yml
 services:
-  synapse:
-    image: ghcr.io/automaat/synapse:latest
+  sybra:
+    image: ghcr.io/automaat/sybra:latest
     restart: unless-stopped
     volumes:
-      - /data/synapse/home:/root/.synapse     # tasks, config, clones
-      - /data/synapse/claude:/root/.claude    # Claude Code settings + hooks
+      - /data/sybra/home:/root/.sybra     # tasks, config, clones
+      - /data/sybra/claude:/root/.claude    # Claude Code settings + hooks
     ports:
       - "127.0.0.1:8080:8080"                # bind locally, expose via reverse proxy
     environment:
-      - SYNAPSE_GITHUB_TOKEN=${GITHUB_TOKEN}
+      - SYBRA_GITHUB_TOKEN=${GITHUB_TOKEN}
 ```
 
 ```sh
@@ -29,12 +29,12 @@ docker compose up -d
 ## Traefik + Cloudflare TLS
 
 ```yaml
-# Add to the synapse service labels:
+# Add to the sybra service labels:
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.synapse.rule=Host(`synapse.example.com`)"
-  - "traefik.http.routers.synapse.tls.certresolver=cloudflare"
-  - "traefik.http.routers.synapse.middlewares=lan-only@file"
+  - "traefik.http.routers.sybra.rule=Host(`sybra.example.com`)"
+  - "traefik.http.routers.sybra.tls.certresolver=cloudflare"
+  - "traefik.http.routers.sybra.middlewares=lan-only@file"
 ```
 
 Restrict access to LAN + VPN CIDRs via a Traefik middleware file:
@@ -65,7 +65,7 @@ Or use the Ansible playbook if you have one configured.
 On the server, scope it to the project types it should handle:
 
 ```yaml
-# /data/synapse/home/config.yaml
+# /data/sybra/home/config.yaml
 project_types: [pet, oss]
 
 github:
@@ -100,7 +100,7 @@ This ensures GitHub Issues for `pet` projects are only picked up by the server, 
 Mount `/root/.claude` to persist Claude Code configuration, hooks, and the `klaudiush` event monitoring setup:
 
 ```
-/data/synapse/claude/
+/data/sybra/claude/
 ├── settings.json        # tool permissions, hooks
 └── hooks/               # custom hook scripts
 ```

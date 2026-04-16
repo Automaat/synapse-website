@@ -1,14 +1,14 @@
 ---
 title: Configuration
-description: Full reference for ~/.synapse/config.yaml.
+description: Full reference for ~/.sybra/config.yaml.
 ---
 
-Sybra reads `~/.synapse/config.yaml` on startup. Changes require a restart.
+Sybra reads `~/.sybra/config.yaml` on startup. Changes require a restart.
 
 ## Full example
 
 ```yaml
-# ~/.synapse/config.yaml
+# ~/.sybra/config.yaml
 
 # Which project types this machine handles (empty = all)
 project_types: [pet, oss]
@@ -52,7 +52,7 @@ Limits which projects this machine's automations act on. Match against the `type
 | `token` | PAT with `repo` scope |
 | `poll_interval` | How often to check for new issues (default `5m`) |
 
-Issues with the label `synapse` (configurable) are imported as tasks. The `project_id` on the resulting task is inferred from the repository.
+Issues with the label `sybra` (configurable) are imported as tasks. The `project_id` on the resulting task is inferred from the repository.
 
 ### `todoist`
 
@@ -80,7 +80,7 @@ Default values applied to all newly created tasks when the field is not explicit
 
 | Variable | Config field |
 |----------|-------------|
-| `SYNAPSE_GITHUB_TOKEN` | `github.token` |
-| `SYNAPSE_TODOIST_TOKEN` | `todoist.api_token` |
+| `SYBRA_GITHUB_TOKEN` | `github.token` |
+| `SYBRA_TODOIST_TOKEN` | `todoist.api_token` |
 
 Environment variables take precedence over `config.yaml`.

@@ -1,7 +1,7 @@
 ---
 import '../styles/landing.css';
 
-const ghUrl = 'https://github.com/automaat/synapse';
+const ghUrl = 'https://github.com/automaat/sybra';
 const docsUrl = '/getting-started/';
 ---
 
@@ -178,7 +178,7 @@ const docsUrl = '/getting-started/';
             {
               n: '04',
               title: 'Git worktree isolation',
-              body: 'Every task gets a dedicated branch and worktree at ~/.synapse/worktrees/<task-id>. Agents never step on each other or your main checkout.',
+              body: 'Every task gets a dedicated branch and worktree at ~/.sybra/worktrees/<task-id>. Agents never step on each other or your main checkout.',
               tag: 'Git',
             },
             {
@@ -223,7 +223,7 @@ const docsUrl = '/getting-started/';
               Scriptable from anywhere
             </h2>
             <p style="font-size: 1.15rem; color: var(--color-muted); line-height: 1.7; margin-bottom: 1.5rem;">
-              <code style="font-family: monospace; color: var(--color-accent); background: var(--color-accent-dim); padding: 2px 6px; border-radius: 4px;">synapse-cli</code> gives you
+              <code style="font-family: monospace; color: var(--color-accent); background: var(--color-accent-dim); padding: 2px 6px; border-radius: 4px;">sybra-cli</code> gives you
               full task and project CRUD from the terminal.
               Use it in scripts, Claude Code skills, or CI pipelines.
             </p>
@@ -244,7 +244,7 @@ const docsUrl = '/getting-started/';
               <div class="terminal-comment"># create and queue a task</div>
               <div class="mt-2">
                 <span class="terminal-prompt">$ </span>
-                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-cmd">sybra-cli</span>
                 <span class="terminal-arg"> create --title "Refactor auth" --mode headless</span>
               </div>
               <div class="terminal-output">✓ task-f7d12a created</div>
@@ -252,7 +252,7 @@ const docsUrl = '/getting-started/';
               <div class="mt-4 terminal-comment"># check what's running</div>
               <div class="mt-2">
                 <span class="terminal-prompt">$ </span>
-                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-cmd">sybra-cli</span>
                 <span class="terminal-arg"> list --status in-progress</span>
               </div>
               <div style="color: #888;" class="mt-1">task-f7d12a  Refactor auth     headless  in-progress</div>
@@ -261,7 +261,7 @@ const docsUrl = '/getting-started/';
               <div class="mt-4 terminal-comment"># mark ready for review</div>
               <div class="mt-2">
                 <span class="terminal-prompt">$ </span>
-                <span class="terminal-cmd">synapse-cli</span>
+                <span class="terminal-cmd">sybra-cli</span>
                 <span class="terminal-arg"> update task-f7d12a --status in-review</span>
               </div>
               <div class="terminal-output">✓ updated</div>

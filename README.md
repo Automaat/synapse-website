@@ -1,6 +1,6 @@
 # sybra-website
 
-Marketing site and documentation for [Sybra](https://github.com/automaat/synapse) — local-first multi-agent orchestration for your desktop.
+Marketing site and documentation for [Sybra](https://github.com/automaat/sybra) — local-first multi-agent orchestration for your desktop.
 
 Built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build).
 

@@ -3,7 +3,7 @@ title: Task Format
 description: YAML frontmatter schema and markdown body conventions for Sybra tasks.
 ---
 
-Tasks are plain markdown files stored in `~/.synapse/tasks/`. The filename is `<id>.md`.
+Tasks are plain markdown files stored in `~/.sybra/tasks/`. The filename is `<id>.md`.
 
 ## Schema
 
@@ -65,13 +65,13 @@ Linking a task to a project enables git worktree isolation:
 project_id: myorg/myrepo
 ```
 
-The agent will check out the project's bare clone into a fresh worktree at `~/.synapse/worktrees/<task-id>/` before starting, and clean up on completion.
+The agent will check out the project's bare clone into a fresh worktree at `~/.sybra/worktrees/<task-id>/` before starting, and clean up on completion.
 
 ## Creating tasks
 
 ```sh
 # Via CLI
-synapse-cli create --title "Add rate limiting" --mode headless --tags backend
+sybra-cli create --title "Add rate limiting" --mode headless --tags backend
 
 # Via GUI
 # Click "New Task" in the sidebar
