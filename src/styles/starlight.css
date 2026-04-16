@@ -18,3 +18,12 @@
   --sl-color-accent: #c35600;
   --sl-color-accent-high: #7a2e00;
 }
+
+/* Themed screenshots — paired by `src/plugins/rehype-themed-screenshots.mjs`. */
+[data-theme='dark'] .screenshot-light,
+:root:not([data-theme='light']) .screenshot-light {
+  display: none;
+}
+[data-theme='light'] .screenshot-dark {
+  display: none;
+}
