@@ -25,15 +25,15 @@ Sybra is keyboard-first. Press **⌘/** from anywhere to open the shortcut cheat
 |---|---|
 | `⌘1` | Dashboard |
 | `⌘2` | Task board |
-| `⌘3` | Agents |
-| `⌘4` | Projects |
+| `⌘3` | Projects |
+| `⌘4` | Agents |
 | `⌘5` | GitHub |
-| `⌘6` | Workflows |
+| `⌘6` | Reviews |
 | `⌘7` | Stats |
 
 ![Command palette](/screenshots/dark/command-palette.png)
 
-The command palette opens with fuzzy search over pages, actions, and tasks. Arrow keys to navigate, Enter to activate.
+The command palette opens with fuzzy search over pages, tasks, and projects. Arrow keys to navigate, Enter to activate.
 
 ## Task board
 
@@ -113,20 +113,9 @@ In the task title/body editor:
 | `⌘Enter` | Create task |
 | `Esc` | Cancel |
 
-## Command palette actions
+## Command palette results
 
-Besides navigation, the palette runs actions. Type to search:
-
-- **Toggle theme** — flip dark/light
-- **Start orchestrator** / **Stop orchestrator**
-- **Run triage now**
-- **Run monitor now**
-- **Reset all workflows** (with confirm)
-- **Open Settings**
-- **Open config in editor**
-- **Reload config**
-
-Every action shows its key binding inline, so the palette teaches shortcuts as you use it.
+The palette searches three sources: **pages**, **tasks**, and **projects**. Select a result to navigate. Operational actions (start orchestrator, run triage, reload config, etc.) are not exposed through the palette today — use the Settings page or the CLI.
 
 ## Customizing
 

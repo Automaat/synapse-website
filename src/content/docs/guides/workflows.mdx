@@ -29,15 +29,20 @@ Pick an event:
 - `task.status_changed` — fires on any status transition
 - `pr.event` — fires on GitHub PR events (opened, updated, closed, labeled)
 
-Add conditions to scope the trigger. Conditions are AND-combined:
+Add conditions to scope the trigger. Conditions are AND-combined and reference one of the fields below:
 
 | Field | Use for |
 |---|---|
+| `task.id` | single-task targeting |
+| `task.title` | title pattern |
+| `task.status` | tasks in a specific status |
 | `task.tags` | "only backend tasks" |
-| `task.task_type` | "only debug tasks" |
-| `task.project_id` | "only this repo" |
 | `task.agent_mode` | "only headless" |
-| `pr.author` | "only Renovate PRs" |
+| `task.project_id` | "only this repo" |
+| `task.branch` | specific branch |
+| `task.pr_number` | tasks with a linked PR |
+| `task.reviewed` | already-reviewed tasks |
+| `pr.issue_kind` | PR failure class (`ci_failure`, `merge_conflict`, …) |
 
 Operators: `equals`, `not_equals`, `contains`, `not_contains`, `exists`.
 
@@ -104,15 +109,15 @@ config:
 ## Branches with `condition`
 
 ```yaml
-- id: check-type
+- id: check-tag
   type: condition
   config:
     branches:
-      - when: { field: task.task_type, operator: equals, value: debug }
-        next: debug-agent
-      - when: { field: task.task_type, operator: equals, value: normal }
-        next: feature-agent
-    else: manual-triage
+      - when: { field: task.tags, operator: contains, value: backend }
+        next: backend-agent
+      - when: { field: task.tags, operator: contains, value: frontend }
+        next: frontend-agent
+    else: generic-agent
 ```
 
 Each branch has a list of conditions (AND). The first matching branch wins. `else` is the fallback.
@@ -136,10 +141,10 @@ If you forked a built-in workflow and want to revert: open the workflow list, cl
 
 Ship and maintained:
 
-- `default-feature` — triage → plan → plan-review → implement → PR
-- `default-debug` — triage → investigate → fix → PR
-- `default-research` — triage → gather → summarize (no code, no PR)
-- `renovate-fix` — CI red? dispatch `pr-fix` agent
+- `simple-task` — default general-purpose workflow (triage → plan → implement → PR)
+- `testing-task` — drives a task through manual testing
+- `pr-review` — attaches to review-tagged tasks
+- `pr-fix` — triggered when a linked PR has CI red or a merge conflict
 
 Treat these as examples. Real teams fork them.
 

@@ -3,7 +3,7 @@ title: Config reference
 description: Full schema for ~/.sybra/config.yaml.
 ---
 
-Location: `~/.sybra/config.yaml`. Reloaded on file change (fsnotify). Env substitution (`$VAR`, `${VAR}`) happens at load time.
+Location: `~/.sybra/config.yaml`. Loaded once at startup. A small set of environment variables override selected fields at runtime — see [Environment variables](/reference/cli/#environment-variables).
 
 ## Complete schema
 
@@ -77,7 +77,7 @@ triage:
   model: "sonnet"
 
 monitor:
-  enabled: false
+  enabled: true
   interval_seconds: 300
   model: "sonnet"
   issue_cooldown_minutes: 30
@@ -140,12 +140,6 @@ metrics:
 project_types: []                 # empty = all; ["work", "pet"] = only these
 
 # ─────────────────────────────────────────────────────────────
-# Server (only consulted by sybra-server)
-# ─────────────────────────────────────────────────────────────
-server:
-  bearer_token: ""
-
-# ─────────────────────────────────────────────────────────────
 # Directory overrides
 # ─────────────────────────────────────────────────────────────
 tasks_dir: "~/.sybra/tasks"
@@ -199,7 +193,7 @@ loop_agents_dir: "~/.sybra/loop-agents"
 | Field | Type | Notes |
 |---|---|---|
 | `enabled` | bool | Feature kill switch |
-| `api_token` | string | Personal API token. Use env substitution. |
+| `api_token` | string | Personal API token. Override at runtime with `SYBRA_TODOIST_TOKEN`. |
 | `project_id` | string | Fetch from this Todoist project |
 | `default_project_id` | string | Target when creating tasks in Todoist |
 | `poll_seconds` | int | Poll interval |
@@ -277,19 +271,6 @@ Empty = accept all project types on this machine. Non-empty = only tasks tied to
 ### Directory overrides
 
 Paths support `~` expansion. Use to point Sybra at a shared NFS mount for multi-machine setups (route carefully via `project_types`).
-
----
-
-## Env substitution
-
-Any string value can reference environment variables:
-
-```yaml
-todoist:
-  api_token: $TODOIST_TOKEN
-```
-
-Substitution at load time. Missing vars render as empty strings.
 
 ---
 

@@ -75,12 +75,12 @@ Open the task (click it or press `Enter`). You see the task detail panel.
 
 ![Task detail](/screenshots/dark/task-detail.png)
 
-Press **S** to move the status to `todo`. Then click **Start agent**.
+Press **S** to move the status to `todo`. Type a prompt into the agent prompt box — the **Start agent** button stays disabled until the prompt is non-empty — then click **Start agent**.
 
 Sybra:
 
 1. Creates a git worktree under `~/.sybra/worktrees/<task-id>/`
-2. Spawns `claude -p "<task body>" --output-format stream-json` in that directory
+2. Spawns `claude -p "<your prompt>" --output-format stream-json` in that directory
 3. Streams NDJSON events back to the UI (init → assistant → tool_use → tool_result → result)
 
 Watch the Agents page:
@@ -93,13 +93,13 @@ Every assistant turn, tool call, and error appears live. Cost updates in real ti
 
 When the agent finishes, it pushes a branch and opens a PR (if your workflow includes the PR step). The task moves to `in-review`.
 
+If your workflow inserts a `plan-review` or `test-plan-review` pause before implementation, the task shows up under **Reviews** in the sidebar:
+
 ![Reviews](/screenshots/dark/reviews.png)
 
-Open **Reviews** in the sidebar. Click the PR. You can read the diff, add inline comments, and dispatch a `pr-fix` agent to address them — all without leaving Sybra.
+From there, approve (`A`), reject (`R`), or send the plan agent feedback (`C`, then `⌘Enter`). See [Review plans](/guides/reviews/) for the full flow.
 
-![Review with comments](/screenshots/dark/reviews-plan-selected.png)
-
-Merge in GitHub, pull locally, done. Sybra removes the worktree automatically.
+For the PR itself, open it on GitHub. Merge there, pull locally, done. Sybra removes the worktree automatically.
 
 ## What just happened
 

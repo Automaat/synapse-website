@@ -10,15 +10,11 @@ A workflow is a directed graph of steps. Triggers fire on task events. Steps run
 ## Anatomy
 
 ```yaml
-id: default-feature
-name: Default feature workflow
+id: simple-task
+name: Simple task
 description: Triage → Plan → Implement → Review → Merge
 trigger:
   on: task.created
-  conditions:
-    - field: task.task_type
-      operator: equals
-      value: normal
 steps:
   - id: triage
     type: run_agent
@@ -65,7 +61,7 @@ Three event sources, one is always required:
 | `task.status_changed` | A task's `status` field changes |
 | `pr.event` | A PR linked to a task gets a GitHub event |
 
-Triggers can be gated by conditions — a list of `{field, operator, value}` tuples combined with AND. Fields reference task fields (`task.tags`, `task.status`, `task.project_id`, `task.agent_mode`) or PR fields (`pr.state`, `pr.author`).
+Triggers can be gated by conditions — a list of `{field, operator, value}` tuples combined with AND. Fields reference the task (`task.id`, `task.title`, `task.status`, `task.tags`, `task.agent_mode`, `task.project_id`, `task.branch`, `task.pr_number`, `task.reviewed`) or the linked PR (`pr.issue_kind`).
 
 ![Trigger panel](/screenshots/dark/workflow-editor-trigger-panel.png)
 
@@ -123,10 +119,10 @@ Shortcuts: `A` approve, `R` reject, `C` focus the feedback box. Messages typed i
 
 Sybra ships a default workflow set:
 
-- `default-feature` — for `task_type: normal`
-- `default-debug` — for `task_type: debug`
-- `default-research` — for `task_type: research`
-- `renovate-fix` — triggered by `pr.event` on Renovate PRs with red CI
+- `simple-task` — default workflow for untagged tasks
+- `testing-task` — manual testing loop
+- `pr-review` — review-tagged tasks
+- `pr-fix` — CI red or merge conflicts on linked PRs
 
 ![Workflows list](/screenshots/dark/workflows.png)
 

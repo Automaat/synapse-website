@@ -15,7 +15,7 @@ From the Projects page → **New project**. Enter a GitHub URL:
 https://github.com/Automaat/sybra
 ```
 
-Pick a type (`work`, `pet`, or a custom value). Optionally set setup commands and sandbox resources.
+Pick a type: `pet` or `work` (no custom types). Setup commands and sandbox resources are edited on the project detail page after creation, not in the create dialog.
 
 On save, Sybra:
 
@@ -93,20 +93,17 @@ Empty `project_types: []` means "all types". See [Orchestrator and automation �
 
 ## Delete a project
 
-From the Projects page → **Delete** (confirm). Sybra:
+From the Projects page → **Delete** (confirm). Sybra removes the project descriptor YAML and the bare clone under `~/.sybra/clones/`.
 
-1. Cancels any running agents on this project
-2. Removes all worktrees
-3. Deletes the bare clone
-4. Removes the descriptor YAML
+Running agents and on-disk worktrees are **not** cleaned up automatically. Stop agents from the Agents page and delete stray worktrees manually if you need a full reset.
 
-Tasks tied to the deleted project keep their `project_id` field but lose the link. They'll show up in the board without a project badge.
+Tasks tied to the deleted project keep their `project_id` field but lose the link. They'll show up on the board without a project badge.
 
 ## Rename a project
 
 GitHub repository renames break the `id` field. Fix in two steps:
 
-1. In the project YAML, update `id` and `clone_url` to the new values
+1. In the project YAML, update `id` and `url` to the new values
 2. Update existing tasks that reference the old ID:
 
    ```bash

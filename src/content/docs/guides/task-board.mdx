@@ -48,16 +48,16 @@ Three paths:
 
 ## Filter
 
-Press `/` (or click the filter bar). Filters stack with AND:
+Press `/` or click the filter icon. The filter panel exposes:
 
-- **Tag**: `tag:backend`
-- **Project**: `project:Automaat/sybra`
-- **Type**: `type:debug`
-- **Agent**: `agent:running`
+- **Search** — matches title and body
+- **Project** — dropdown of registered projects
+- **Tags** — type tags into the input; combined with AND
+- **Agent mode** — `headless` or `interactive`
 
 ![Filtered board](/screenshots/dark/task-board-filtered.png)
 
-Filter state lives in the URL (`?tag=backend&type=debug`). Bookmark useful views.
+Filter state is not persisted in the URL — reopen the panel to reapply.
 
 ## Change a task's status
 
@@ -89,8 +89,9 @@ Markdown edits save on blur. The fsnotify watcher picks up the new frontmatter i
 From a task detail:
 
 1. Ensure status is `todo`
-2. Click **Start agent** (or the row shortcut)
-3. Sybra creates a worktree, spawns the agent, streams events live
+2. Type a prompt into the agent prompt box — **Start agent** stays disabled until the prompt is non-empty
+3. Click **Start agent**
+4. Sybra creates a worktree, spawns the agent, and streams events live
 
 Once running, the card shows a live agent indicator. Cost ticks up as tokens flow. Click the card to jump to Agent Detail.
 

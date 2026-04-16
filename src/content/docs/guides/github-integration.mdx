@@ -51,12 +51,11 @@ Click a PR to open detail view:
 
 ![PR detail](/screenshots/dark/github-pr-detail.png)
 
-Actions per PR:
+Actions on PR detail:
 
-- **Mark ready** — flips a draft PR to ready-for-review
-- **Fix CI** — dispatches a headless agent on the PR's branch to fix red CI
-- **Request review** — requests a review from the configured reviewers
-- **Merge** — merges via GraphQL (respects branch protection)
+- **Open in Browser** — jump to the PR on GitHub
+
+The authored-PR detail view intentionally avoids write actions today. Approve, Merge, Rerun Checks, and Fix CI are wired up only on Renovate-authored rows — see [Renovate](#renovate) below.
 
 ## Reviews
 

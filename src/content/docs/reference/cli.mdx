@@ -45,7 +45,7 @@ sybra-cli list --project Automaat/sybra --json
 sybra-cli get <id>
 ```
 
-Prints the full markdown file with frontmatter.
+Prints structured key-value output (ID, Title, Status, Mode, Type, Tags, Project, Branch, PR, Issue, Created, Updated, Body, Plan, Plan Critique). Pass `--json` at the top level for JSON output suitable for scripts.
 
 #### `create`
 
@@ -91,7 +91,7 @@ Null/missing flags preserve existing values.
 sybra-cli delete <id>
 ```
 
-Removes the markdown file. If the task has a live agent, the agent is killed first.
+Removes the markdown file, stored comments, and any saved plan. Running agents are not cancelled — stop them from the Agents page first if the task has a live run.
 
 ### Projects
 
@@ -121,7 +121,7 @@ Clones the repo as a bare mirror.
 sybra-cli project delete <id>
 ```
 
-Removes the bare clone, all worktrees, and the descriptor YAML.
+Removes the bare clone and the descriptor YAML. Worktrees and running agents are not cleaned up automatically — handle those separately.
 
 ### Diagnostics
 
@@ -152,18 +152,19 @@ Prints the current health report: running agents, stuck tasks, provider status.
 #### `triage`
 
 ```
-sybra-cli triage [--dry-run]
+sybra-cli triage classify <id>
+sybra-cli triage classify --all
 ```
 
-Runs one triage cycle. With `--dry-run`, prints proposed actions without applying.
+Classifies a single task by ID, or every un-triaged task when `--all` is passed. Prints the proposed classification and applies it.
 
 #### `monitor`
 
 ```
-sybra-cli monitor [--dry-run]
+sybra-cli monitor scan [--json]
 ```
 
-Runs one monitor cycle (anomaly detection).
+One-shot read-only monitor pass. Prints detected anomalies; no remediation dispatched.
 
 #### `selfmonitor`
 
@@ -179,42 +180,37 @@ sybra-cli selfmonitor ledger [--limit N]
 
 ## `sybra-server`
 
-HTTP API daemon. Use for deploying Sybra headlessly on a server.
+HTTP API daemon. Use for deploying Sybra headlessly on a server. Configuration is via environment variables; there are no command-line flags.
 
-```
-sybra-server [--port 8080] [--config ~/.sybra/config.yaml]
+```bash
+SYBRA_PORT=8080 sybra-server
 ```
 
-| Flag | Default | Notes |
+| Variable | Default | Notes |
 |---|---|---|
-| `--port` | `8080` | HTTP listen port |
-| `--config` | `~/.sybra/config.yaml` | Config file path |
+| `SYBRA_PORT` | `8080` | HTTP listen port |
+| `SYBRA_STATIC_DIR` | unset | Serve a static directory at `/` (optional, for bundled UIs) |
+| `SYBRA_PPROF` | unset | When set, enables `net/http/pprof` endpoints under `/debug/pprof/` |
 
-The server exposes REST endpoints mirroring Wails bound methods. It does NOT ship a GUI — use the desktop app against the server's API, or query it directly.
+The server loads `~/.sybra/config.yaml` the same way the desktop app does.
 
-### Endpoints
+### API style
 
-- `GET /api/tasks` — list tasks
-- `POST /api/tasks` — create task
-- `GET /api/tasks/:id` — get task
-- `PATCH /api/tasks/:id` — update task
-- `DELETE /api/tasks/:id` — delete task
-- `GET /api/agents` — list agents
-- `POST /api/agents/:id/messages` — send message
-- `GET /api/projects` — list projects
-- `GET /api/health` — liveness + config summary
-- `GET /events` — Server-Sent Events stream of all Wails events
+Every Wails-bound method is exposed as an RPC endpoint:
 
-### Auth
-
-Single bearer token in `~/.sybra/config.yaml`:
-
-```yaml
-server:
-  bearer_token: <random-string>
+```
+POST /api/{service}/{method}
 ```
 
-Absent token = unauthenticated (localhost only; the server refuses to bind external interfaces without a token).
+Request body is a JSON array of positional arguments. Response body is the JSON-encoded return value.
+
+```bash
+curl -s http://localhost:8080/api/tasks/List \
+  -H 'content-type: application/json' \
+  -d '[]'
+```
+
+Service and method names mirror the Go bindings — `tasks`, `agents`, `projects`, `workflows`, and so on. Query a running server's `/events` endpoint for the SSE stream of app events.
 
 ### Deployment
 
